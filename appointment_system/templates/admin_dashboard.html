@@ -1,0 +1,123 @@
+
+<!-- admin_dashboard.html -->
+{% extends "layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Admin Dashboard</h1>
+    <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">Logout</a>
+</div>
+
+<div class="card">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="background: #3498db; color: white; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h3>{{ appointments|length }}</h3>
+            <p>Total Appointments</p>
+        </div>
+        <div style="background: #f39c12; color: white; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h3>{{ appointments|selectattr("status", "equalto", "Pending")|list|length }}</h3>
+            <p>Pending</p>
+        </div>
+        <div style="background: #27ae60; color: white; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h3>{{ appointments|selectattr("status", "equalto", "Approved")|list|length }}</h3>
+            <p>Approved</p>
+        </div>
+        <div style="background: #e74c3c; color: white; padding: 1.5rem; border-radius: 8px; text-align: center;">
+            <h3>{{ appointments|selectattr("status", "equalto", "Cancelled")|list|length }}</h3>
+            <p>Cancelled</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>All Appointments</h2>
+    
+    {% if not appointments %}
+        <div style="text-align: center; padding: 2rem; color: #666;">
+            <p><em>No appointments yet.</em></p>
+            <a href="{{ url_for('index') }}" class="btn">Go to Home Page</a>
+        </div>
+    {% else %}
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Booked On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in appointments %}
+                        <tr>
+                            <td>#{{ a.id }}</td>
+                            <td>{{ a.user_name }}</td>
+                            <td>{{ a.user_email }}</td>
+                            <td>{{ a.user_phone }}</td>
+                            <td>{{ a.service }}</td>
+                            <td>{{ a.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ a.time.strftime('%I:%M %p') }}</td>
+                            <td>
+                                <span class="status-{{ a.status.lower() }}">
+                                    {{ a.status }}
+                                </span>
+                            </td>
+                            <td>{{ a.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <form method="post" action="{{ url_for('update_status', appt_id=a.id) }}" style="display:inline; margin-right: 0.5rem;">
+                                    <select name="status" onchange="this.form.submit()" style="width: auto; padding: 0.25rem;">
+                                        {% for s in ['Pending','Approved','Cancelled','Completed'] %}
+                                            <option value="{{ s }}" {% if s==a.status %}selected{% endif %}>{{ s }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                                <a href="{{ url_for('delete_appointment', appt_id=a.id) }}" 
+                                   class="btn btn-danger btn-small"
+                                   onclick="return confirm('Are you sure you want to delete this appointment?')">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% if a.message %}
+                        <tr>
+                            <td colspan="10" style="background: #f8f9fa; font-style: italic; padding-left: 2rem;">
+                                <strong>Message:</strong> {{ a.message }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .btn-small {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        table {
+            font-size: 0.8rem;
+        }
+        
+        th, td {
+            padding: 0.5rem 0.25rem;
+        }
+    }
+</style>
+{% endblock %}

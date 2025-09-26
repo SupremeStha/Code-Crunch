@@ -1,0 +1,81 @@
+{% extends "layout.html" %} {% block title %}Booking Successful{% endblock %} {%
+block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow text-center">
+                <div class="card-body p-5">
+                    <div class="success-icon mb-4">
+                        <i class="fas fa-check-circle fa-5x text-success"></i>
+                    </div>
+                    <h2 class="text-success mb-3">
+                        Appointment Booked Successfully!
+                    </h2>
+                    <p class="lead mb-4">
+                        Your appointment has been scheduled and you will receive
+                        a confirmation email shortly.
+                    </p>
+
+                    <div
+                        class="appointment-details bg-light p-4 rounded mb-4 text-start"
+                    >
+                        <h5 class="mb-3">Appointment Details:</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Appointment ID:</strong>
+                            </div>
+                            <div class="col-6">#{{ appointment.id }}</div>
+
+                            <div class="col-6"><strong>Name:</strong></div>
+                            <div class="col-6">{{ appointment.user_name }}</div>
+
+                            <div class="col-6"><strong>Service:</strong></div>
+                            <div class="col-6">{{ appointment.service }}</div>
+
+                            <div class="col-6"><strong>Date:</strong></div>
+                            <div class="col-6">
+                                {{ appointment.date.strftime('%B %d, %Y') }}
+                            </div>
+
+                            <div class="col-6"><strong>Time:</strong></div>
+                            <div class="col-6">
+                                {{ appointment.time.strftime('%I:%M %p') }}
+                            </div>
+
+                            <div class="col-6"><strong>Status:</strong></div>
+                            <div class="col-6">
+                                <span class="badge bg-warning text-dark"
+                                    >{{ appointment.status }}</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Important:</strong> Please save your appointment
+                        ID (#{{ appointment.id }}) for future reference.
+                    </div>
+
+                    <div
+                        class="d-grid gap-2 d-md-flex justify-content-md-center"
+                    >
+                        <a
+                            href="{{ url_for('index') }}"
+                            class="btn btn-primary me-md-2"
+                        >
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                        <a
+                            href="{{ url_for('check_status') }}"
+                            class="btn btn-outline-primary"
+                        >
+                            <i class="fas fa-search me-2"></i>Check Status
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
