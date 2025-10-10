@@ -1,0 +1,225 @@
+{% extends "layout.html" %} 
+{% block title %}Admin Login{% endblock %} 
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1 class="login-title">Admin Login</h1>
+            <p class="login-subtitle">Please login to access the admin dashboard</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_login') }}" class="login-form">
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input" 
+                    placeholder="Enter your username" 
+                    required 
+                    autocomplete="username"
+                />
+                <i class="form-icon">👤</i>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-input" 
+                    placeholder="Enter your password" 
+                    required 
+                    autocomplete="current-password"
+                />
+                <i class="form-icon">🔒</i>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
+            </div>
+        </form>
+
+        <div class="demo-credentials">
+            <h3>Demo Credentials</h3>
+            <div class="credentials">
+                <div class="credential-item">
+                    <span class="credential-label">Username:</span>
+                    <span class="credential-value">admin</span>
+                </div>
+                <div class="credential-item">
+                    <span class="credential-label">Password:</span>
+                    <span class="credential-value">password123</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem 1rem;
+    }
+
+    .login-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        position: relative;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .login-title {
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .login-subtitle {
+        color: #7f8c8d;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .login-form {
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    .form-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 2.4rem;
+        font-size: 1rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        flex: 1;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-credentials {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border-top: 1px solid #eee;
+    }
+
+    .demo-credentials h3 {
+        margin: 0 0 1rem 0;
+        font-size: 1rem;
+        color: #2c3e50;
+    }
+
+    .credentials {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .credential-item {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .credential-label {
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    .credential-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 2rem 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

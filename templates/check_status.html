@@ -1,0 +1,437 @@
+{% extends "layout.html" %}
+{% block title %}Check Appointment Status{% endblock %}
+
+{% block content %}
+<style>
+    .status-page {
+        background-color: #f5f1ed;
+        min-height: calc(100vh - 56px);
+        padding: 60px 0;
+    }
+
+    .status-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 42px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #1a1a1a;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #b8834a;
+        font-size: 16px;
+        margin-bottom: 40px;
+    }
+
+    .status-header {
+        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
+        color: #fff;
+        padding: 40px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+    }
+
+    .status-header h2 {
+        font-size: 32px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .status-header p {
+        font-size: 16px;
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    .status-form-container {
+        background: #fff;
+        padding: 50px;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .form-row-status {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .form-group-status {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group-status.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group-status label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .icon-svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .form-group-status input {
+        padding: 14px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 15px;
+        font-family: inherit;
+        transition: border-color 0.3s;
+        background-color: #fff;
+    }
+
+    .form-group-status input:focus {
+        outline: none;
+        border-color: #4a8bc2;
+        box-shadow: 0 0 0 3px rgba(74, 139, 194, 0.1);
+    }
+
+    .search-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 20px;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 139, 194, 0.3);
+    }
+
+    .search-btn:active {
+        transform: translateY(0);
+    }
+
+    .alert-status {
+        padding: 15px 20px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .alert-success-status {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .alert-danger-status {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-status .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0.5;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+    }
+
+    .alert-status .btn-close:hover {
+        opacity: 1;
+    }
+
+    /* Appointment Details */
+    .appointment-details {
+        margin-top: 40px;
+    }
+
+    .appointment-details h5 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 20px;
+    }
+
+    .details-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .details-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 25px;
+    }
+
+    .detail-item {
+        margin-bottom: 20px;
+    }
+
+    .detail-item strong {
+        color: #666;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-item p {
+        color: #1a1a1a;
+        font-size: 16px;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .appointment-id {
+        color: #4a8bc2 !important;
+        font-weight: 600 !important;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-confirmed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-completed {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .message-section {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .message-section strong {
+        color: #666;
+        font-size: 14px;
+        display: block;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .message-section p {
+        color: #555;
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .booked-info {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 2px solid #e0e0e0;
+        color: #999;
+        font-size: 13px;
+    }
+
+    .booked-info strong {
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .form-row-status,
+        .details-row {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .status-form-container {
+            padding: 30px 20px;
+        }
+
+        .details-card {
+            padding: 25px;
+        }
+
+        .page-title {
+            font-size: 32px;
+        }
+
+        .status-header h2 {
+            font-size: 26px;
+        }
+    }
+</style>
+
+<div class="status-page">
+    <div class="status-container">
+        <h1 class="page-title">Check Appointment Status</h1>
+        <p class="page-subtitle">Track your appointment and view details</p>
+
+        <div class="status-header">
+            <h2>Appointment Lookup</h2>
+            <p>Enter your email to check your appointment status</p>
+        </div>
+
+        <div class="status-form-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert-status alert-{{ 'danger' if category == 'error' else 'success' }}-status">
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-row-status">
+                    <div class="form-group-status">
+                        <label for="email">
+                            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Email Address *
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            value="{{ request.form.email if request.form.email }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group-status">
+                        <label for="appointment_id">
+                            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Appointment ID (Optional)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="appointment_id" 
+                            name="appointment_id"
+                            value="{{ request.form.appointment_id if request.form.appointment_id }}"
+                            placeholder="Leave blank for most recent"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search me-2"></i>Check Status
+                </button>
+            </form>
+
+            {% if appointment %}
+            <div class="appointment-details">
+                <h5>Appointment Information</h5>
+                <div class="details-card">
+                    <div class="details-row">
+                        <div>
+                            <div class="detail-item">
+                                <strong>Appointment ID</strong>
+                                <p class="appointment-id">#{{ appointment.id }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Name</strong>
+                                <p>{{ appointment.user_name }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Email</strong>
+                                <p>{{ appointment.user_email }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone</strong>
+                                <p>{{ appointment.user_phone }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="detail-item">
+                                <strong>Service Type</strong>
+                                <p>{{ appointment.service }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Date</strong>
+                                <p>{{ appointment.date.strftime('%B %d, %Y') }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Time</strong>
+                                <p>{{ appointment.time.strftime('%I:%M %p') }}</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Status</strong>
+                                <p>
+                                    <span class="status-badge {% if appointment.status == 'Confirmed' %}status-confirmed{% elif appointment.status == 'Pending' %}status-pending{% elif appointment.status == 'Cancelled' %}status-cancelled{% else %}status-completed{% endif %}">
+                                        {{ appointment.status }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if appointment.message %}
+                    <div class="message-section">
+                        <strong>Additional Notes</strong>
+                        <p>{{ appointment.message }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="booked-info">
+                        <strong>Booked on:</strong> {{ appointment.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,312 @@
+{% extends "layout.html" %}
+{% block title %}Home - Code Crunch{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
+        color: white;
+        padding: 120px 0;
+        text-align: center;
+    }
+
+    .hero-section h1 {
+        font-size: 56px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .hero-section p {
+        font-size: 20px;
+        margin-bottom: 40px;
+        opacity: 0.95;
+    }
+
+    .hero-btn {
+        background-color: #fff;
+        color: #b8834a;
+        padding: 16px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .hero-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        color: #b8834a;
+    }
+
+    .hero-btn i {
+        margin-right: 8px;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 80px 0;
+        background-color: #fff;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 42px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: #666;
+    }
+
+    .feature-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 40px 30px;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e0e0e0;
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        border-color: #b8834a;
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        color: white;
+        font-size: 32px;
+    }
+
+    .feature-card h5 {
+        font-size: 22px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+
+    .feature-card p {
+        font-size: 15px;
+        color: #666;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Quick Actions Section */
+    .quick-actions {
+        padding: 80px 0;
+        background-color: #f5f1ed;
+    }
+
+    .quick-actions h3 {
+        text-align: center;
+        font-size: 42px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 50px;
+    }
+
+    .action-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 50px 40px;
+        text-align: center;
+        height: 100%;
+        border: 1px solid #e0e0e0;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .action-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        color: white;
+        font-size: 36px;
+    }
+
+    .action-card h5 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+    }
+
+    .action-card p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .action-btn {
+        background: linear-gradient(135deg, #b8834a 0%, #936b3d 100%);
+        color: #fff;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(184, 131, 74, 0.3);
+        color: #fff;
+    }
+
+    .action-btn-outline {
+        background: transparent;
+        color: #b8834a;
+        border: 2px solid #b8834a;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .action-btn-outline:hover {
+        background: #b8834a;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(184, 131, 74, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 36px;
+        }
+
+        .hero-section p {
+            font-size: 16px;
+        }
+
+        .section-header h2,
+        .quick-actions h3 {
+            font-size: 32px;
+        }
+
+        .feature-card,
+        .action-card {
+            margin-bottom: 20px;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1>Book Your Appointment Easily</h1>
+        <p>Schedule your mental health appointments online with our simple and efficient booking system</p>
+        <a href="{{ url_for('book_appointment') }}" class="hero-btn">
+            <i class="fas fa-calendar-plus"></i>Book Now
+        </a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Choose Our Booking System?</h2>
+            <p>Simple, fast, and reliable appointment scheduling</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h5>24/7 Availability</h5>
+                    <p>Book appointments anytime, anywhere with our online system. Access our platform whenever it's convenient for you.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h5>Instant Notifications</h5>
+                    <p>Get immediate confirmation and status updates via email. Stay informed about your appointments in real-time.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h5>Mobile Friendly</h5>
+                    <p>Easy to use on any device - desktop, tablet, or mobile. Book on the go with our responsive design.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="quick-actions">
+    <div class="container">
+        <h3>Get Started Today</h3>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h5>Book New Appointment</h5>
+                    <p>Schedule your appointment in just a few clicks. Our streamlined process makes booking quick and easy.</p>
+                    <a href="{{ url_for('book_appointment') }}" class="action-btn">Book Now</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h5>Check Status</h5>
+                    <p>Track your existing appointment status and view details. Stay updated on your scheduled appointments.</p>
+                    <a href="{{ url_for('check_status') }}" class="action-btn-outline">Check Status</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
