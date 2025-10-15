@@ -1,0 +1,534 @@
+{% extends "layout.html" %}
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .appointment-page {
+        background: #f0ebe5;
+        min-height: calc(100vh - 56px);
+        padding: 3rem 0;
+    }
+
+    .appointment-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #b8860b;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: #fff;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .form-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -5%;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .form-header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-header p {
+        font-size: 1rem;
+        opacity: 0.95;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-container {
+        background: #fff;
+        padding: 3rem;
+    }
+
+    .form-row-custom {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group-custom {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group-custom.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group-custom label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .icon-svg {
+        width: 20px;
+        height: 20px;
+        color: #b8860b;
+        flex-shrink: 0;
+    }
+
+    .form-group-custom input[type="text"],
+    .form-group-custom input[type="email"],
+    .form-group-custom input[type="tel"],
+    .form-group-custom input[type="date"],
+    .form-group-custom input[type="time"],
+    .form-group-custom select,
+    .form-group-custom textarea {
+        padding: 1rem 1.25rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+    .form-group-custom input:focus,
+    .form-group-custom select:focus,
+    .form-group-custom textarea:focus {
+        outline: none;
+        border-color: #c8956d;
+        box-shadow: 0 0 0 4px rgba(200, 149, 109, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-group-custom input::placeholder,
+    .form-group-custom textarea::placeholder {
+        color: #999;
+    }
+
+    .form-group-custom select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23666' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 3rem;
+    }
+
+    .form-group-custom select:hover {
+        border-color: #c8956d;
+    }
+
+    .form-group-custom textarea {
+        resize: vertical;
+        min-height: 150px;
+        font-family: inherit;
+        line-height: 1.6;
+    }
+
+    .required-mark {
+        color: #e74c3c;
+        margin-left: 2px;
+    }
+
+    .submit-btn-custom {
+        width: 100%;
+        padding: 1.1rem;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .submit-btn-custom:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+    }
+
+    .submit-btn-custom:active {
+        transform: translateY(-1px);
+    }
+
+    .submit-btn-custom svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .alert-custom {
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success-custom {
+        background-color: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+    }
+
+    .alert-danger-custom {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+    }
+
+    .alert-custom .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.5;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+    }
+
+    .alert-custom .btn-close:hover {
+        opacity: 1;
+    }
+
+    .form-info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .form-info-box svg {
+        width: 20px;
+        height: 20px;
+        color: #1976d2;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .form-info-box p {
+        color: #1565c0;
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Input focus effects with icons */
+    .form-group-custom {
+        position: relative;
+    }
+
+    .form-group-custom input:focus ~ .icon-svg,
+    .form-group-custom select:focus ~ .icon-svg,
+    .form-group-custom textarea:focus ~ .icon-svg {
+        color: #c8956d;
+    }
+
+    /* Date and time inputs styling */
+    .form-group-custom input[type="date"],
+    .form-group-custom input[type="time"] {
+        cursor: pointer;
+    }
+
+    .form-group-custom input[type="date"]::-webkit-calendar-picker-indicator,
+    .form-group-custom input[type="time"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        filter: opacity(0.6);
+    }
+
+    .form-group-custom input[type="date"]:hover::-webkit-calendar-picker-indicator,
+    .form-group-custom input[type="time"]:hover::-webkit-calendar-picker-indicator {
+        filter: opacity(1);
+    }
+
+    @media (max-width: 768px) {
+        .appointment-container {
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-row-custom {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-container {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .appointment-container {
+            padding: 0 0.75rem;
+        }
+
+        .form-container {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
+
+<div class="appointment-page">
+    <div class="appointment-container">
+        <h1 class="page-title">Book an Appointment</h1>
+        <p class="page-subtitle">Schedule a session with our qualified mental health professionals</p>
+
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Appointment Details</h2>
+                <p>Fill out the form below to book your appointment</p>
+            </div>
+
+            <div class="form-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert-custom alert-{{ 'danger' if category == 'error' else 'success' }}-custom">
+                        <span>{{ message }}</span>
+                        <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <div class="form-info-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <p><strong>Note:</strong> All appointments are subject to confirmation. You will receive an email notification once your appointment is reviewed by our team.</p>
+                </div>
+
+                <form method="POST" id="appointmentForm">
+                    <div class="form-row-custom">
+                        <div class="form-group-custom">
+                            <label for="name">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                Full Name <span class="required-mark">*</span>
+                            </label>
+                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label for="email">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                                Email Address <span class="required-mark">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-custom">
+                        <div class="form-group-custom">
+                            <label for="phone">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                                Phone Number <span class="required-mark">*</span>
+                            </label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label for="service">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                Service Type <span class="required-mark">*</span>
+                            </label>
+                            <select id="service" name="service" required>
+                                <option value="">Select a service...</option>
+                                <option value="Consultation">Initial Consultation</option>
+                                <option value="Technical Support">Follow-up Session</option>
+                                <option value="Training">Therapy Session</option>
+                                <option value="Maintenance">Mental Health Assessment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row-custom">
+                        <div class="form-group-custom">
+                            <label for="date">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                Preferred Date <span class="required-mark">*</span>
+                            </label>
+                            <input type="date" id="date" name="date" min="{{ today }}" required>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label for="time">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Preferred Time <span class="required-mark">*</span>
+                            </label>
+                            <input type="time" id="time" name="time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group-custom full-width">
+                        <label for="message">
+                            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Additional Notes (Optional)
+                        </label>
+                        <textarea id="message" name="message" placeholder="Please share any specific concerns or information that would help us prepare for your appointment..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn-custom">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                        </svg>
+                        Submit Appointment Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set minimum date to today
+    document.getElementById("date").min = new Date().toISOString().split("T")[0];
+
+    // Form validation
+    document.getElementById("appointmentForm").addEventListener("submit", function (e) {
+        const date = new Date(document.getElementById("date").value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (date < today) {
+            e.preventDefault();
+            alert("Please select a future date.");
+        }
+    });
+
+    // Add visual feedback when inputs are filled
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.style.borderColor = '#c8956d';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+    });
+</script>
+{% endblock %}
