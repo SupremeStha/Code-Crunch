@@ -1,7 +1,5 @@
-{% extends "layout.html" %}
-{% block title %}Home - Code Crunch{% endblock %}
-
-{% block content %}
+{% extends "layout.html" %} {% block title %}Home - Code Crunch{% endblock %} {%
+block content %}
 <style>
     * {
         margin: 0;
@@ -10,7 +8,8 @@
     }
 
     body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Oxygen, Ubuntu, Cantarell, sans-serif;
         line-height: 1.6;
         color: #1a202c;
         overflow-x: hidden;
@@ -19,9 +18,13 @@
     .hero {
         margin-top: -85px;
         min-height: 100vh;
-        background: 
-            linear-gradient(135deg, rgba(146, 84, 41, 0.75) 0%, rgba(166, 94, 51, 0.7) 50%, rgba(186, 104, 61, 0.75) 100%),
-            url('../static/images/background.png');
+        background: linear-gradient(
+                135deg,
+                rgba(146, 84, 41, 0.75) 0%,
+                rgba(166, 94, 51, 0.7) 50%,
+                rgba(186, 104, 61, 0.75) 100%
+            ),
+            url("../static/images/background.png");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -36,36 +39,50 @@
     }
 
     .hero::before {
-        content: '';
+        content: "";
         position: absolute;
         width: 150%;
         height: 150%;
-        background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 70% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+        background: radial-gradient(
+                circle at 30% 50%,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle at 70% 50%,
+                rgba(255, 255, 255, 0.08) 0%,
+                transparent 50%
+            );
         animation: rotate 25s linear infinite;
     }
 
     @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 
     .hero::after {
-        content: '';
+        content: "";
         position: absolute;
         bottom: -1px;
         left: 0;
         right: 0;
         height: 290px;
-        background: linear-gradient(to top, 
-            #925429 0%, 
+        background: linear-gradient(
+            to top,
+            #925429 0%,
             #925429 15%,
             rgba(146, 84, 41, 0.95) 25%,
             rgba(146, 84, 41, 0.85) 35%,
             rgba(146, 84, 41, 0.7) 50%,
             rgba(146, 84, 41, 0.4) 65%,
             rgba(146, 84, 41, 0.15) 85%,
-            transparent 100%);
+            transparent 100%
+        );
         pointer-events: none;
         z-index: 2;
     }
@@ -89,12 +106,17 @@
     }
 
     @keyframes float-particle {
-        0%, 100% {
+        0%,
+        100% {
             transform: translate(0, 0);
             opacity: 0;
         }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
         100% {
             transform: translate(100px, -1000px);
             opacity: 0;
@@ -177,10 +199,11 @@
         background: white;
         color: #925429;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        border: 2px solid white;
     }
 
     .btn-primary::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -189,6 +212,7 @@
         background: #f7f7f7;
         opacity: 0;
         transition: opacity 0.4s ease;
+        border: 2px solid white;
     }
 
     .btn-primary:hover::before {
@@ -202,7 +226,9 @@
 
     .btn-primary:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        color: #925429;
+        box-shadow: 0 12px 40px rgb(255, 255, 255);
+        border: 2px solid white;
     }
 
     .btn-secondary {
@@ -228,7 +254,7 @@
     }
 
     .stats-section::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -269,7 +295,12 @@
 
     .features-section {
         padding: 8rem 5%;
-        background: linear-gradient(to bottom, #f9f7f4 0%, #ffffff 50%, #f9f7f4 100%);
+        background: linear-gradient(
+            to bottom,
+            #f9f7f4 0%,
+            #ffffff 50%,
+            #f9f7f4 100%
+        );
         position: relative;
     }
 
@@ -327,7 +358,7 @@
     }
 
     .feature-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -340,13 +371,17 @@
     }
 
     .feature-card::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 50%;
         left: 50%;
         width: 0;
         height: 0;
-        background: radial-gradient(circle, rgba(146, 84, 41, 0.05) 0%, transparent 70%);
+        background: radial-gradient(
+            circle,
+            rgba(146, 84, 41, 0.05) 0%,
+            transparent 70%
+        );
         transform: translate(-50%, -50%);
         transition: width 0.6s ease, height 0.6s ease;
         border-radius: 50%;
@@ -457,7 +492,12 @@
 
     .cta-section {
         padding: 8rem 5%;
-        background: linear-gradient(135deg, #7d4623 0%, #925429 50%, #a65e33 100%);
+        background: linear-gradient(
+            135deg,
+            #7d4623 0%,
+            #925429 50%,
+            #a65e33 100%
+        );
         text-align: center;
         color: white;
         position: relative;
@@ -465,11 +505,15 @@
     }
 
     .cta-section::before {
-        content: '';
+        content: "";
         position: absolute;
         width: 800px;
         height: 800px;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        background: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 70%
+        );
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -477,11 +521,12 @@
     }
 
     @keyframes pulse-glow {
-        0%, 100% { 
+        0%,
+        100% {
             transform: translate(-50%, -50%) scale(1);
             opacity: 0.5;
         }
-        50% { 
+        50% {
             transform: translate(-50%, -50%) scale(1.2);
             opacity: 0.8;
         }
@@ -517,19 +562,40 @@
     }
 
     @media (max-width: 968px) {
-        .hero h1 { font-size: 3rem; }
-        .hero p { font-size: 1.1rem; }
-        .section-title { font-size: 2.2rem; }
-        .cta-section h2 { font-size: 2.5rem; }
-        .features-grid { grid-template-columns: 1fr; }
-        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .hero h1 {
+            font-size: 3rem;
+        }
+        .hero p {
+            font-size: 1.1rem;
+        }
+        .section-title {
+            font-size: 2.2rem;
+        }
+        .cta-section h2 {
+            font-size: 2.5rem;
+        }
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     @media (max-width: 480px) {
-        .hero h1 { font-size: 2.2rem; }
-        .hero-buttons, .cta-buttons { flex-direction: column; }
-        .btn { width: 100%; }
-        .stats-grid { grid-template-columns: 1fr; }
+        .hero h1 {
+            font-size: 2.2rem;
+        }
+        .hero-buttons,
+        .cta-buttons {
+            flex-direction: column;
+        }
+        .btn {
+            width: 100%;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
@@ -538,10 +604,19 @@
     <div class="hero-content">
         <span class="hero-badge">🧠 AI-POWERED MENTAL WELLNESS</span>
         <h1>Professional Mental Health Support</h1>
-        <p>Connect with licensed therapists or get immediate AI-powered guidance. Your mental wellness journey begins with a single step.</p>
+        <p>
+            Connect with licensed therapists or get immediate AI-powered
+            guidance. Your mental wellness journey begins with a single step.
+        </p>
         <div class="hero-buttons">
-            <a href="{{ url_for('chat') }}" class="btn btn-primary"><span>Talk To Chatbot</span></a>
-            <a href="{{ url_for('book_appointment') }}" class="btn btn-secondary">Book An Appointment</a>
+            <a href="{{ url_for('ai_assessment') }}" class="btn btn-primary"
+                ><span>Talk To Chatbot</span></a
+            >
+            <a
+                href="{{ url_for('book_appointment') }}"
+                class="btn btn-secondary"
+                >Book An Appointment</a
+            >
         </div>
     </div>
 </section>
@@ -571,23 +646,35 @@
     <div class="section-header">
         <span class="section-badge">Smart Features</span>
         <h2 class="section-title">How We Support Your Mental Health</h2>
-        <p class="section-subtitle">Comprehensive tools and professional support designed for your wellness journey</p>
+        <p class="section-subtitle">
+            Comprehensive tools and professional support designed for your
+            wellness journey
+        </p>
     </div>
     <div class="features-grid">
         <div class="feature-card">
             <div class="feature-icon">💬</div>
             <h3>24/7 AI Support</h3>
-            <p>Get immediate mental health support and guidance from our AI assistant, available around the clock for whenever you need it.</p>
+            <p>
+                Get immediate mental health support and guidance from our AI
+                assistant, available around the clock for whenever you need it.
+            </p>
         </div>
         <div class="feature-card">
             <div class="feature-icon">📋</div>
             <h3>Professional Sessions</h3>
-            <p>Book appointments with qualified mental health professionals for personalized care tailored to your unique needs.</p>
+            <p>
+                Book appointments with qualified mental health professionals for
+                personalized care tailored to your unique needs.
+            </p>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🛡️</div>
             <h3>Professional Portal</h3>
-            <p>Mental health professionals can manage appointments, track patient progress, and deliver exceptional care.</p>
+            <p>
+                Mental health professionals can manage appointments, track
+                patient progress, and deliver exceptional care.
+            </p>
         </div>
     </div>
 </section>
@@ -596,24 +683,36 @@
     <div class="section-header">
         <span class="section-badge">Testimonials</span>
         <h2 class="section-title">What Our Users Say</h2>
-        <p class="section-subtitle">Real stories from people who found support through our platform</p>
+        <p class="section-subtitle">
+            Real stories from people who found support through our platform
+        </p>
     </div>
     <div class="testimonials-grid">
         <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">"The AI chatbot helped me during a difficult night when I couldn't reach my therapist. It's been a game-changer for my mental health journey."</p>
+            <p class="testimonial-text">
+                "The AI chatbot helped me during a difficult night when I
+                couldn't reach my therapist. It's been a game-changer for my
+                mental health journey."
+            </p>
             <div class="testimonial-author">Sarah M.</div>
             <div class="testimonial-role">Platform User</div>
         </div>
         <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">"As a therapist, this platform makes managing my practice so much easier. The professional portal is intuitive and powerful."</p>
+            <p class="testimonial-text">
+                "As a therapist, this platform makes managing my practice so
+                much easier. The professional portal is intuitive and powerful."
+            </p>
             <div class="testimonial-author">Dr. James Wilson</div>
             <div class="testimonial-role">Licensed Therapist</div>
         </div>
         <div class="testimonial-card">
             <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">"Finding the right therapist was easy, and the scheduling system is seamless. I finally feel like I'm getting the help I need."</p>
+            <p class="testimonial-text">
+                "Finding the right therapist was easy, and the scheduling system
+                is seamless. I finally feel like I'm getting the help I need."
+            </p>
             <div class="testimonial-author">Emily R.</div>
             <div class="testimonial-role">Platform User</div>
         </div>
@@ -623,48 +722,59 @@
 <section class="cta-section">
     <div class="cta-content">
         <h2>Ready to Take the First Step?</h2>
-        <p>Your mental health matters. Start your journey toward wellness today with our comprehensive support system and connect with professionals who care.</p>
+        <p>
+            Your mental health matters. Start your journey toward wellness today
+            with our comprehensive support system and connect with professionals
+            who care.
+        </p>
         <div class="cta-buttons">
-            <a href="{{ url_for('chat') }}" class="btn btn-primary"><span>Start Free Chat</span></a>
-            <a href="{{ url_for('book_appointment') }}" class="btn btn-secondary">Find a Professional</a>
+            <a href="{{ url_for('ai_assessment') }}" class="btn btn-primary"
+                ><span>Start Free Chat</span></a
+            >
+            <a
+                href="{{ url_for('book_appointment') }}"
+                class="btn btn-secondary"
+                >Find a Professional</a
+            >
         </div>
     </div>
 </section>
 
 <script>
-    const particlesContainer = document.querySelector('.particles');
+    const particlesContainer = document.querySelector(".particles");
     for (let i = 0; i < 20; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.animationDelay = Math.random() * 15 + 's';
-        p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.animationDelay = Math.random() * 15 + "s";
+        p.style.animationDuration = Math.random() * 10 + 10 + "s";
         particlesContainer.appendChild(p);
     }
 
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const target = document.querySelector(this.getAttribute("href"));
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
             }
         });
     });
 
-    const observerOptions = { threshold: 0.5, rootMargin: '0px' };
+    const observerOptions = { threshold: 0.5, rootMargin: "0px" };
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
-                const statNumbers = entry.target.querySelectorAll('.stat-number');
-                statNumbers.forEach(stat => {
+                const statNumbers =
+                    entry.target.querySelectorAll(".stat-number");
+                statNumbers.forEach((stat) => {
                     const text = stat.textContent;
-                    if (text.includes('K')) {
-                        animateValue(stat, 0, parseInt(text), 2000, 'K+');
-                    } else if (text.includes('%')) {
-                        animateValue(stat, 0, parseInt(text), 2000, '%');
+                    if (text.includes("K")) {
+                        animateValue(stat, 0, parseInt(text), 2000, "K+");
+                    } else if (text.includes("%")) {
+                        animateValue(stat, 0, parseInt(text), 2000, "%");
                     } else {
-                        stat.style.opacity = '1';
+                        stat.style.opacity = "1";
                     }
                 });
                 observer.unobserve(entry.target);
@@ -672,10 +782,10 @@
         });
     }, observerOptions);
 
-    const statsSection = document.querySelector('.stats-section');
+    const statsSection = document.querySelector(".stats-section");
     if (statsSection) observer.observe(statsSection);
 
-    function animateValue(el, start, end, duration, suffix = '') {
+    function animateValue(el, start, end, duration, suffix = "") {
         let startTime = null;
         const step = (timestamp) => {
             if (!startTime) startTime = timestamp;
@@ -687,9 +797,9 @@
         window.requestAnimationFrame(step);
     }
 
-    const featureCards = document.querySelectorAll('.feature-card');
-    featureCards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
+    const featureCards = document.querySelectorAll(".feature-card");
+    featureCards.forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -699,14 +809,15 @@
             const rotateY = (centerX - x) / 20;
             card.style.transform = `translateY(-12px) scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
         });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0) scale(1) rotateX(0) rotateY(0)';
+        card.addEventListener("mouseleave", () => {
+            card.style.transform =
+                "translateY(0) scale(1) rotateX(0) rotateY(0)";
         });
     });
 
-    window.addEventListener('scroll', () => {
+    window.addEventListener("scroll", () => {
         const scrolled = window.pageYOffset;
-        const hero = document.querySelector('.hero');
+        const hero = document.querySelector(".hero");
         if (hero && scrolled < window.innerHeight) {
             hero.style.transform = `translateY(${scrolled * 0.5}px)`;
         }
