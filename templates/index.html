@@ -3,310 +3,713 @@
 
 {% block content %}
 <style>
-    .hero-section {
-        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
-        color: white;
-        padding: 120px 0;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: #1a202c;
+        overflow-x: hidden;
+    }
+
+    .hero {
+        margin-top: -85px;
+        min-height: 100vh;
+        background: 
+            linear-gradient(135deg, rgba(146, 84, 41, 0.75) 0%, rgba(166, 94, 51, 0.7) 50%, rgba(186, 104, 61, 0.75) 100%),
+            url('../static/images/background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
+        color: white;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
     }
 
-    .hero-section h1 {
-        font-size: 56px;
-        font-weight: 700;
-        margin-bottom: 20px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    .hero::before {
+        content: '';
+        position: absolute;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+        animation: rotate 25s linear infinite;
     }
 
-    .hero-section p {
-        font-size: 20px;
-        margin-bottom: 40px;
-        opacity: 0.95;
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
-    .hero-btn {
-        background-color: #fff;
-        color: #b8834a;
-        padding: 16px 40px;
-        font-size: 18px;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
+    .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 290px;
+        background: linear-gradient(to top, 
+            #925429 0%, 
+            #925429 15%,
+            rgba(146, 84, 41, 0.95) 25%,
+            rgba(146, 84, 41, 0.85) 35%,
+            rgba(146, 84, 41, 0.7) 50%,
+            rgba(146, 84, 41, 0.4) 65%,
+            rgba(146, 84, 41, 0.15) 85%,
+            transparent 100%);
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        animation: float-particle 15s infinite;
+    }
+
+    @keyframes float-particle {
+        0%, 100% {
+            transform: translate(0, 0);
+            opacity: 0;
+        }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% {
+            transform: translate(100px, -1000px);
+            opacity: 0;
+        }
+    }
+
+    .hero-content {
+        max-width: 1000px;
+        z-index: 1;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hero-badge {
         display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
     }
 
-    .hero-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        color: #b8834a;
+    .hero h1 {
+        font-size: 4.5rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+        text-shadow: 2px 4px 20px rgba(0, 0, 0, 0.3);
+        letter-spacing: -2px;
     }
 
-    .hero-btn i {
-        margin-right: 8px;
+    .hero p {
+        font-size: 1.4rem;
+        margin-bottom: 3rem;
+        line-height: 1.8;
+        font-weight: 300;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        text-shadow: 1px 2px 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* Features Section */
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 1.1rem 2.8rem;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        cursor: pointer;
+        text-transform: capitalize;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #925429;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #f7f7f7;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .btn-primary:hover::before {
+        opacity: 1;
+    }
+
+    .btn-primary span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+        background: white;
+        color: #925429;
+        border-color: white;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .stats-section {
+        padding: 6rem 5%;
+        background: linear-gradient(180deg, #925429 0%, #7d4623 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+        background-size: 30px 30px;
+        opacity: 0.3;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-item {
+        text-align: center;
+        color: white;
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
     .features-section {
-        padding: 80px 0;
-        background-color: #fff;
+        padding: 8rem 5%;
+        background: linear-gradient(to bottom, #f9f7f4 0%, #ffffff 50%, #f9f7f4 100%);
+        position: relative;
     }
 
     .section-header {
         text-align: center;
-        margin-bottom: 60px;
+        margin-bottom: 5rem;
     }
 
-    .section-header h2 {
-        font-size: 42px;
+    .section-badge {
+        display: inline-block;
+        background: #d4ecd7;
+        border: 1px solid #b8d4bb;
+        color: #2d5f3a;
+        padding: 0.6rem 1.5rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
         font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 15px;
+        letter-spacing: 1.5px;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
     }
 
-    .section-header p {
-        font-size: 18px;
-        color: #666;
+    .section-title {
+        font-size: 3.2rem;
+        font-weight: 800;
+        color: #2d3748;
+        letter-spacing: -1px;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #4a5568;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+        max-width: 1300px;
+        margin: 0 auto;
     }
 
     .feature-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 40px 30px;
-        text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid #e0e0e0;
-        height: 100%;
+        background: white;
+        padding: 3rem;
+        border-radius: 24px;
+        border: 2px solid #f0f0f0;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #925429, #ba683d);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s ease;
+    }
+
+    .feature-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: radial-gradient(circle, rgba(146, 84, 41, 0.05) 0%, transparent 70%);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+        border-radius: 50%;
     }
 
     .feature-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-        border-color: #b8834a;
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 24px 48px rgba(146, 84, 41, 0.15);
+        border-color: #925429;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover::after {
+        width: 400px;
+        height: 400px;
     }
 
     .feature-icon {
-        width: 70px;
-        height: 70px;
-        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
-        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #d4ecd7 0%, #b8d4bb 100%);
+        border: 2px solid #a0d4aa;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 25px;
-        color: white;
-        font-size: 32px;
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
     }
 
-    .feature-card h5 {
-        font-size: 22px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 15px;
+    .feature-card:hover .feature-icon {
+        transform: scale(1.15) rotate(-5deg);
+        box-shadow: 0 8px 24px rgba(146, 84, 41, 0.3);
+    }
+
+    .feature-card h3 {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: #2d3748;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
     }
 
     .feature-card p {
-        font-size: 15px;
-        color: #666;
-        line-height: 1.6;
-        margin: 0;
+        color: #4a5568;
+        line-height: 1.8;
+        font-size: 1.05rem;
+        position: relative;
+        z-index: 1;
     }
 
-    /* Quick Actions Section */
-    .quick-actions {
-        padding: 80px 0;
-        background-color: #f5f1ed;
+    .testimonials-section {
+        padding: 8rem 5%;
+        background: white;
     }
 
-    .quick-actions h3 {
-        text-align: center;
-        font-size: 42px;
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 3rem auto 0;
+    }
+
+    .testimonial-card {
+        background: #f9f7f4;
+        padding: 2.5rem;
+        border-radius: 20px;
+        border: 2px solid #e8e5e0;
+        transition: all 0.4s ease;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-8px);
+        border-color: #925429;
+        box-shadow: 0 12px 32px rgba(146, 84, 41, 0.15);
+    }
+
+    .testimonial-stars {
+        color: #d4a574;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .testimonial-text {
+        color: #4a5568;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        font-style: italic;
+    }
+
+    .testimonial-author {
+        color: #2d3748;
         font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 50px;
     }
 
-    .action-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 50px 40px;
+    .testimonial-role {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+
+    .cta-section {
+        padding: 8rem 5%;
+        background: linear-gradient(135deg, #7d4623 0%, #925429 50%, #a65e33 100%);
         text-align: center;
-        height: 100%;
-        border: 1px solid #e0e0e0;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .action-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-
-    .action-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #c89b6d 0%, #b8834a 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 25px;
         color: white;
-        font-size: 36px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .action-card h5 {
-        font-size: 24px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 15px;
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: pulse-glow 8s ease-in-out infinite;
     }
 
-    .action-card p {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 30px;
-    }
-
-    .action-btn {
-        background: linear-gradient(135deg, #b8834a 0%, #936b3d 100%);
-        color: #fff;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(184, 131, 74, 0.3);
-        color: #fff;
-    }
-
-    .action-btn-outline {
-        background: transparent;
-        color: #b8834a;
-        border: 2px solid #b8834a;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .action-btn-outline:hover {
-        background: #b8834a;
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(184, 131, 74, 0.3);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .hero-section h1 {
-            font-size: 36px;
+    @keyframes pulse-glow {
+        0%, 100% { 
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.5;
         }
-
-        .hero-section p {
-            font-size: 16px;
+        50% { 
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0.8;
         }
+    }
 
-        .section-header h2,
-        .quick-actions h3 {
-            font-size: 32px;
-        }
+    .cta-content {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
 
-        .feature-card,
-        .action-card {
-            margin-bottom: 20px;
-        }
+    .cta-section h2 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        letter-spacing: -1px;
+        text-shadow: 2px 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta-section p {
+        font-size: 1.3rem;
+        margin-bottom: 3rem;
+        opacity: 0.95;
+        line-height: 1.8;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 968px) {
+        .hero h1 { font-size: 3rem; }
+        .hero p { font-size: 1.1rem; }
+        .section-title { font-size: 2.2rem; }
+        .cta-section h2 { font-size: 2.5rem; }
+        .features-grid { grid-template-columns: 1fr; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+        .hero h1 { font-size: 2.2rem; }
+        .hero-buttons, .cta-buttons { flex-direction: column; }
+        .btn { width: 100%; }
+        .stats-grid { grid-template-columns: 1fr; }
     }
 </style>
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <h1>Book Your Appointment Easily</h1>
-        <p>Schedule your mental health appointments online with our simple and efficient booking system</p>
-        <a href="{{ url_for('book_appointment') }}" class="hero-btn">
-            <i class="fas fa-calendar-plus"></i>Book Now
-        </a>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="features-section">
-    <div class="container">
-        <div class="section-header">
-            <h2>Why Choose Our Booking System?</h2>
-            <p>Simple, fast, and reliable appointment scheduling</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h5>24/7 Availability</h5>
-                    <p>Book appointments anytime, anywhere with our online system. Access our platform whenever it's convenient for you.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <h5>Instant Notifications</h5>
-                    <p>Get immediate confirmation and status updates via email. Stay informed about your appointments in real-time.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h5>Mobile Friendly</h5>
-                    <p>Easy to use on any device - desktop, tablet, or mobile. Book on the go with our responsive design.</p>
-                </div>
-            </div>
+<section class="hero" id="home">
+    <div class="particles"></div>
+    <div class="hero-content">
+        <span class="hero-badge">🧠 AI-POWERED MENTAL WELLNESS</span>
+        <h1>Professional Mental Health Support</h1>
+        <p>Connect with licensed therapists or get immediate AI-powered guidance. Your mental wellness journey begins with a single step.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('chat') }}" class="btn btn-primary"><span>Talk To Chatbot</span></a>
+            <a href="{{ url_for('book_appointment') }}" class="btn btn-secondary">Book An Appointment</a>
         </div>
     </div>
 </section>
 
-<!-- Quick Actions -->
-<section class="quick-actions">
-    <div class="container">
-        <h3>Get Started Today</h3>
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-calendar-plus"></i>
-                    </div>
-                    <h5>Book New Appointment</h5>
-                    <p>Schedule your appointment in just a few clicks. Our streamlined process makes booking quick and easy.</p>
-                    <a href="{{ url_for('book_appointment') }}" class="action-btn">Book Now</a>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h5>Check Status</h5>
-                    <p>Track your existing appointment status and view details. Stay updated on your scheduled appointments.</p>
-                    <a href="{{ url_for('check_status') }}" class="action-btn-outline">Check Status</a>
-                </div>
-            </div>
+<section class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-number">10K+</span>
+            <span class="stat-label">Active Users</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Licensed Therapists</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">24/7</span>
+            <span class="stat-label">AI Support</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">98%</span>
+            <span class="stat-label">Satisfaction Rate</span>
         </div>
     </div>
 </section>
+
+<section class="features-section" id="features">
+    <div class="section-header">
+        <span class="section-badge">Smart Features</span>
+        <h2 class="section-title">How We Support Your Mental Health</h2>
+        <p class="section-subtitle">Comprehensive tools and professional support designed for your wellness journey</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>24/7 AI Support</h3>
+            <p>Get immediate mental health support and guidance from our AI assistant, available around the clock for whenever you need it.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3>Professional Sessions</h3>
+            <p>Book appointments with qualified mental health professionals for personalized care tailored to your unique needs.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Professional Portal</h3>
+            <p>Mental health professionals can manage appointments, track patient progress, and deliver exceptional care.</p>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials-section" id="testimonials">
+    <div class="section-header">
+        <span class="section-badge">Testimonials</span>
+        <h2 class="section-title">What Our Users Say</h2>
+        <p class="section-subtitle">Real stories from people who found support through our platform</p>
+    </div>
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">"The AI chatbot helped me during a difficult night when I couldn't reach my therapist. It's been a game-changer for my mental health journey."</p>
+            <div class="testimonial-author">Sarah M.</div>
+            <div class="testimonial-role">Platform User</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">"As a therapist, this platform makes managing my practice so much easier. The professional portal is intuitive and powerful."</p>
+            <div class="testimonial-author">Dr. James Wilson</div>
+            <div class="testimonial-role">Licensed Therapist</div>
+        </div>
+        <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">"Finding the right therapist was easy, and the scheduling system is seamless. I finally feel like I'm getting the help I need."</p>
+            <div class="testimonial-author">Emily R.</div>
+            <div class="testimonial-role">Platform User</div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Take the First Step?</h2>
+        <p>Your mental health matters. Start your journey toward wellness today with our comprehensive support system and connect with professionals who care.</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('chat') }}" class="btn btn-primary"><span>Start Free Chat</span></a>
+            <a href="{{ url_for('book_appointment') }}" class="btn btn-secondary">Find a Professional</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    const particlesContainer = document.querySelector('.particles');
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 15 + 's';
+        p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particlesContainer.appendChild(p);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    const observerOptions = { threshold: 0.5, rootMargin: '0px' };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const statNumbers = entry.target.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const text = stat.textContent;
+                    if (text.includes('K')) {
+                        animateValue(stat, 0, parseInt(text), 2000, 'K+');
+                    } else if (text.includes('%')) {
+                        animateValue(stat, 0, parseInt(text), 2000, '%');
+                    } else {
+                        stat.style.opacity = '1';
+                    }
+                });
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) observer.observe(statsSection);
+
+    function animateValue(el, start, end, duration, suffix = '') {
+        let startTime = null;
+        const step = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            const value = Math.floor(progress * (end - start) + start);
+            el.textContent = value + suffix;
+            if (progress < 1) window.requestAnimationFrame(step);
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    const featureCards = document.querySelectorAll('.feature-card');
+    featureCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            card.style.transform = `translateY(-12px) scale(1.02) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0) scale(1) rotateX(0) rotateY(0)';
+        });
+    });
+
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero');
+        if (hero && scrolled < window.innerHeight) {
+            hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+        }
+    });
+</script>
 {% endblock %}
