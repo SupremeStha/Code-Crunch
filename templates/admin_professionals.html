@@ -1,0 +1,456 @@
+{% extends "layout.html" %}
+{% block title %}Manage Professionals - Admin{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .admin-page {
+        background: #f0ebe5;
+        min-height: calc(100vh - 56px);
+        padding: 3rem 0;
+    }
+
+    .admin-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .btn-add {
+        padding: 0.9rem 2rem;
+        background: linear-gradient(135deg, #27ae60, #229954);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+    }
+
+    .btn-add svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .professionals-table {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+    }
+
+    thead th {
+        padding: 1.25rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.85rem;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background-color 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    tbody td {
+        padding: 1.25rem 1rem;
+        color: #2c3e50;
+    }
+
+    .prof-name-cell {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+
+    .prof-title-cell {
+        color: #666;
+        font-size: 0.85rem;
+        margin-top: 3px;
+    }
+
+    .status-active {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.4rem 0.9rem;
+        background: #d4edda;
+        color: #155724;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-inactive {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.4rem 0.9rem;
+        background: #f8d7da;
+        color: #721c24;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .rating-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stars-small {
+        display: flex;
+        gap: 2px;
+    }
+
+    .star-small {
+        color: #ffc107;
+        font-size: 0.9rem;
+    }
+
+    .rating-value {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-sm svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .btn-view {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .btn-view:hover {
+        background: #bbdefb;
+        transform: translateY(-1px);
+    }
+
+    .btn-edit {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .btn-edit:hover {
+        background: #ffeaa7;
+        transform: translateY(-1px);
+    }
+
+    .btn-delete {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .btn-delete:hover {
+        background: #f5c6cb;
+        transform: translateY(-1px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        color: #ccc;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #c8956d;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        gap: 0.75rem;
+        color: #b8860b;
+    }
+
+    .back-link svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .spec-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .spec-tag-sm {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.3rem 0.7rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    @media (max-width: 1024px) {
+        .admin-container {
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .btn-add {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .table-wrapper {
+            overflow-x: scroll;
+        }
+
+        table {
+            min-width: 800px;
+        }
+    }
+</style>
+
+<div class="admin-page">
+    <div class="admin-container">
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Dashboard
+        </a>
+
+        <div class="page-header">
+            <h1 class="page-title">Manage Professionals</h1>
+            <a href="{{ url_for('add_professional') }}" class="btn-add">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add New Professional
+            </a>
+        </div>
+
+        <div class="professionals-table">
+            {% if professionals %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name & Title</th>
+                            <th>Specializations</th>
+                            <th>Experience</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prof in professionals %}
+                        <tr>
+                            <td>#{{ prof.id }}</td>
+                            <td>
+                                <div class="prof-name-cell">{{ prof.name }}</div>
+                                <div class="prof-title-cell">{{ prof.title }}</div>
+                            </td>
+                            <td>
+                                <div class="spec-tags">
+                                    {% for spec in prof.specialization.split(',')[:2] %}
+                                    <span class="spec-tag-sm">{{ spec.strip() }}</span>
+                                    {% endfor %}
+                                    {% if prof.specialization.split(',')|length > 2 %}
+                                    <span class="spec-tag-sm">+{{ prof.specialization.split(',')|length - 2 }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ prof.experience_years }} years</td>
+                            <td>
+                                <div class="rating-cell">
+                                    <div class="stars-small">
+                                        {% for i in range(5) %}
+                                        <span class="star-small">★</span>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="rating-value">{{ prof.rating }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if prof.is_active %}
+                                <span class="status-active">
+                                    <span class="status-dot"></span>
+                                    Active
+                                </span>
+                                {% else %}
+                                <span class="status-inactive">
+                                    <span class="status-dot"></span>
+                                    Inactive
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('professional_detail', prof_id=prof.id) }}" class="btn-sm btn-view">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        View
+                                    </a>
+                                    <a href="{{ url_for('edit_professional', prof_id=prof.id) }}" class="btn-sm btn-edit">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        Edit
+                                    </a>
+                                    <a href="{{ url_for('delete_professional', prof_id=prof.id) }}" 
+                                       class="btn-sm btn-delete"
+                                       onclick="return confirm('Are you sure you want to delete {{ prof.name }}? This action cannot be undone.')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <h3>No Professionals Yet</h3>
+                <p>Add your first mental health professional to get started.</p>
+                <a href="{{ url_for('add_professional') }}" class="btn-add">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Professional
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

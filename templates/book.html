@@ -16,9 +16,30 @@
     }
 
     .appointment-container {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 0 2rem;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #c8956d;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        gap: 0.75rem;
+        color: #b8860b;
+    }
+
+    .back-button svg {
+        width: 20px;
+        height: 20px;
     }
 
     .page-title {
@@ -36,6 +57,127 @@
         margin-bottom: 3rem;
     }
 
+    .booking-layout {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    /* Professional Summary Card */
+    .professional-summary {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 2rem;
+    }
+
+    .summary-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .prof-summary-image {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .prof-summary-image svg {
+        width: 50px;
+        height: 50px;
+        color: white;
+    }
+
+    .prof-summary-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .prof-summary-title {
+        color: #b8860b;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-rating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .summary-stars {
+        display: flex;
+        gap: 3px;
+    }
+
+    .summary-star {
+        color: #ffc107;
+        font-size: 1rem;
+    }
+
+    .summary-rating-text {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .summary-info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .summary-info-item svg {
+        width: 20px;
+        height: 20px;
+        color: #c8956d;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .summary-info-content {
+        flex: 1;
+    }
+
+    .summary-info-label {
+        font-size: 0.8rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .summary-info-value {
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    /* Form Card */
     .form-card {
         background: white;
         border-radius: 20px;
@@ -295,32 +437,15 @@
         line-height: 1.5;
     }
 
-    /* Input focus effects with icons */
-    .form-group-custom {
-        position: relative;
-    }
+    @media (max-width: 1024px) {
+        .booking-layout {
+            grid-template-columns: 1fr;
+        }
 
-    .form-group-custom input:focus ~ .icon-svg,
-    .form-group-custom select:focus ~ .icon-svg,
-    .form-group-custom textarea:focus ~ .icon-svg {
-        color: #c8956d;
-    }
-
-    /* Date and time inputs styling */
-    .form-group-custom input[type="date"],
-    .form-group-custom input[type="time"] {
-        cursor: pointer;
-    }
-
-    .form-group-custom input[type="date"]::-webkit-calendar-picker-indicator,
-    .form-group-custom input[type="time"]::-webkit-calendar-picker-indicator {
-        cursor: pointer;
-        filter: opacity(0.6);
-    }
-
-    .form-group-custom input[type="date"]:hover::-webkit-calendar-picker-indicator,
-    .form-group-custom input[type="time"]:hover::-webkit-calendar-picker-indicator {
-        filter: opacity(1);
+        .professional-summary {
+            position: static;
+            order: -1;
+        }
     }
 
     @media (max-width: 768px) {
@@ -353,6 +478,10 @@
         .form-header h2 {
             font-size: 1.5rem;
         }
+
+        .professional-summary {
+            padding: 1.5rem;
+        }
     }
 
     @media (max-width: 480px) {
@@ -368,136 +497,216 @@
 
 <div class="appointment-page">
     <div class="appointment-container">
+        <a href="{{ url_for('professional_detail', prof_id=professional.id) }}" class="back-button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Profile
+        </a>
+
         <h1 class="page-title">Book an Appointment</h1>
-        <p class="page-subtitle">Schedule a session with our qualified mental health professionals</p>
+        <p class="page-subtitle">Schedule your session with {{ professional.name }}</p>
 
-        <div class="form-card">
-            <div class="form-header">
-                <h2>Appointment Details</h2>
-                <p>Fill out the form below to book your appointment</p>
-            </div>
-
-            <div class="form-container">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert-custom alert-{{ 'danger' if category == 'error' else 'success' }}-custom">
-                        <span>{{ message }}</span>
-                        <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
-                    </div>
-                    {% endfor %}
-                {% endif %}
-                {% endwith %}
-
-                <div class="form-info-box">
+        <div class="booking-layout">
+            <!-- Professional Summary Sidebar -->
+            <div class="professional-summary">
+                <h3 class="summary-title">Your Professional</h3>
+                
+                <div class="prof-summary-image">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    <p><strong>Note:</strong> All appointments are subject to confirmation. You will receive an email notification once your appointment is reviewed by our team.</p>
                 </div>
 
-                <form method="POST" id="appointmentForm">
-                    <div class="form-row-custom">
-                        <div class="form-group-custom">
-                            <label for="name">
-                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                Full Name <span class="required-mark">*</span>
-                            </label>
-                            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-                        </div>
+                <h4 class="prof-summary-name">{{ professional.name }}</h4>
+                <p class="prof-summary-title">{{ professional.title }}</p>
 
-                        <div class="form-group-custom">
-                            <label for="email">
-                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                    <polyline points="22,6 12,13 2,6"></polyline>
-                                </svg>
-                                Email Address <span class="required-mark">*</span>
-                            </label>
-                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
-                        </div>
+                <div class="summary-rating">
+                    <div class="summary-stars">
+                        {% for i in range(5) %}
+                        <span class="summary-star">★</span>
+                        {% endfor %}
                     </div>
+                    <span class="summary-rating-text">{{ professional.rating }}</span>
+                </div>
 
-                    <div class="form-row-custom">
-                        <div class="form-group-custom">
-                            <label for="phone">
-                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                                </svg>
-                                Phone Number <span class="required-mark">*</span>
-                            </label>
-                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
-                        </div>
-
-                        <div class="form-group-custom">
-                            <label for="service">
-                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                </svg>
-                                Service Type <span class="required-mark">*</span>
-                            </label>
-                            <select id="service" name="service" required>
-                                <option value="">Select a service...</option>
-                                <option value="Consultation">Initial Consultation</option>
-                                <option value="Follow-up Session">Follow-up Session</option>
-                                <option value="Therapy Session">Therapy Session</option>
-                                <option value="Mental Health Assessment">Mental Health Assessment</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
+                <div class="summary-info-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                    <div class="summary-info-content">
+                        <span class="summary-info-label">Specialization</span>
+                        <div class="summary-info-value">{{ professional.specialization.split(',')[0].strip() }}</div>
                     </div>
+                </div>
 
-                    <div class="form-row-custom">
-                        <div class="form-group-custom">
-                            <label for="date">
-                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                Preferred Date <span class="required-mark">*</span>
-                            </label>
-                            <input type="date" id="date" name="date" min="{{ today }}" required>
-                        </div>
-
-                        <div class="form-group-custom">
-                            <label for="time">
-                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                                Preferred Time <span class="required-mark">*</span>
-                            </label>
-                            <input type="time" id="time" name="time" required>
-                        </div>
+                <div class="summary-info-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <div class="summary-info-content">
+                        <span class="summary-info-label">Experience</span>
+                        <div class="summary-info-value">{{ professional.experience_years }} Years</div>
                     </div>
+                </div>
 
-                    <div class="form-group-custom full-width">
-                        <label for="message">
-                            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                            Additional Notes (Optional)
-                        </label>
-                        <textarea id="message" name="message" placeholder="Please share any specific concerns or information that would help us prepare for your appointment..."></textarea>
+                <div class="summary-info-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <div class="summary-info-content">
+                        <span class="summary-info-label">Languages</span>
+                        <div class="summary-info-value">{{ professional.languages }}</div>
                     </div>
+                </div>
 
-                    <button type="submit" class="submit-btn-custom">
+                <div class="summary-info-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <div class="summary-info-content">
+                        <span class="summary-info-label">Available Days</span>
+                        <div class="summary-info-value">{{ professional.available_days.split(',')[0].strip() }}{% if professional.available_days.split(',')|length > 1 %} +{{ professional.available_days.split(',')|length - 1 }} more{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>Appointment Details</h2>
+                    <p>Fill out the form below to book your appointment</p>
+                </div>
+
+                <div class="form-container">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert-custom alert-{{ 'danger' if category == 'error' else 'success' }}-custom">
+                            <span>{{ message }}</span>
+                            <button type="button" class="btn-close" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <div class="form-info-box">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
-                        Submit Appointment Request
-                    </button>
-                </form>
+                        <p><strong>Note:</strong> All appointments are subject to confirmation. You will receive an email notification once your appointment is reviewed by our team.</p>
+                    </div>
+
+                    <form method="POST" id="appointmentForm">
+                        <div class="form-row-custom">
+                            <div class="form-group-custom">
+                                <label for="name">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    Full Name <span class="required-mark">*</span>
+                                </label>
+                                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                            </div>
+
+                            <div class="form-group-custom">
+                                <label for="email">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Email Address <span class="required-mark">*</span>
+                                </label>
+                                <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row-custom">
+                            <div class="form-group-custom">
+                                <label for="phone">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                    Phone Number <span class="required-mark">*</span>
+                                </label>
+                                <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000" required>
+                            </div>
+
+                            <div class="form-group-custom">
+                                <label for="service">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    </svg>
+                                    Service Type <span class="required-mark">*</span>
+                                </label>
+                                <select id="service" name="service" required>
+                                    <option value="">Select a service...</option>
+                                    <option value="Consultation">Initial Consultation</option>
+                                    <option value="Follow-up Session">Follow-up Session</option>
+                                    <option value="Therapy Session">Therapy Session</option>
+                                    <option value="Mental Health Assessment">Mental Health Assessment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row-custom">
+                            <div class="form-group-custom">
+                                <label for="date">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    Preferred Date <span class="required-mark">*</span>
+                                </label>
+                                <input type="date" id="date" name="date" min="{{ today }}" required>
+                            </div>
+
+                            <div class="form-group-custom">
+                                <label for="time">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Preferred Time <span class="required-mark">*</span>
+                                </label>
+                                <input type="time" id="time" name="time" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group-custom full-width">
+                            <label for="message">
+                                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                Additional Notes (Optional)
+                            </label>
+                            <textarea id="message" name="message" placeholder="Please share any specific concerns or information that would help us prepare for your appointment..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn-custom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                            Submit Appointment Request
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,765 @@
+{% extends "layout.html" %} {% block title %}Add Professional - Admin{% endblock
+%} {% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .admin-page {
+        background: #f0ebe5;
+        min-height: calc(100vh - 56px);
+        padding: 3rem 0;
+    }
+
+    .admin-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #c8956d;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        gap: 0.75rem;
+        color: #b8860b;
+    }
+
+    .back-link svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+
+    .page-subtitle {
+        text-align: center;
+        color: #b8860b;
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: #fff;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .form-header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-header p {
+        font-size: 1rem;
+        opacity: 0.95;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-container {
+        padding: 3rem;
+    }
+
+    .alert-custom {
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+    }
+
+    .alert-custom .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.5;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        transition: opacity 0.3s;
+    }
+
+    .alert-custom .btn-close:hover {
+        opacity: 1;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+        margin-bottom: 2rem;
+    }
+
+    .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .icon-svg {
+        width: 20px;
+        height: 20px;
+        color: #b8860b;
+        flex-shrink: 0;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="url"],
+    .form-group textarea,
+    .form-group select {
+        padding: 1rem 1.25rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #c8956d;
+        box-shadow: 0 0 0 4px rgba(200, 149, 109, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+        line-height: 1.6;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #999;
+    }
+
+    .required-mark {
+        color: #e74c3c;
+        margin-left: 2px;
+    }
+
+    .help-text {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 10px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #c8956d;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1.1rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #27ae60, #229954);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+    }
+
+    .btn-secondary {
+        background: #e0e0e0;
+        color: #555;
+    }
+
+    .btn-secondary:hover {
+        background: #d0d0d0;
+        transform: translateY(-2px);
+    }
+
+    .btn:active {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .admin-container {
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-container {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="admin-page">
+    <div class="admin-container">
+        <a href="{{ url_for('admin_professionals') }}" class="back-link">
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Professionals
+        </a>
+
+        <h1 class="page-title">Add New Professional</h1>
+        <p class="page-subtitle">
+            Fill in the details to add a new mental health professional
+        </p>
+
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Professional Information</h2>
+                <p>Complete all required fields below</p>
+            </div>
+
+            <div class="form-container">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %} {% for category, message in messages %}
+                <div class="alert-custom alert-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        onclick="this.parentElement.remove()"
+                    >
+                        ×
+                    </button>
+                </div>
+                {% endfor %} {% endif %} {% endwith %}
+
+                <form method="POST" id="professionalForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">
+                                <svg
+                                    class="icon-svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                                    ></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                Full Name <span class="required-mark">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Dr. Jane Smith"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="title">
+                                <svg
+                                    class="icon-svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M22 10v6M2 10l10-5 10 5-10 5z"
+                                    ></path>
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                                </svg>
+                                Professional Title
+                                <span class="required-mark">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                placeholder="Licensed Clinical Psychologist"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="experience_years">
+                                <svg
+                                    class="icon-svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline
+                                        points="12 6 12 12 16 14"
+                                    ></polyline>
+                                </svg>
+                                Years of Experience
+                                <span class="required-mark">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="experience_years"
+                                name="experience_years"
+                                min="1"
+                                max="50"
+                                placeholder="10"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="languages">
+                                <svg
+                                    class="icon-svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path
+                                        d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                                    ></path>
+                                </svg>
+                                Languages <span class="required-mark">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="languages"
+                                name="languages"
+                                placeholder="English, Spanish"
+                                required
+                            />
+                            <span class="help-text"
+                                >Separate multiple languages with commas</span
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="specialization">
+                            <svg
+                                class="icon-svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                            Specializations <span class="required-mark">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="specialization"
+                            name="specialization"
+                            placeholder="Anxiety, Depression, Trauma & PTSD, Family Therapy"
+                            required
+                        />
+                        <span class="help-text"
+                            >Separate multiple specializations with commas</span
+                        >
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="bio">
+                            <svg
+                                class="icon-svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                                ></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                            Professional Bio
+                            <span class="required-mark">*</span>
+                        </label>
+                        <textarea
+                            id="bio"
+                            name="bio"
+                            placeholder="Write a brief professional biography highlighting experience, approach, and areas of expertise..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="education">
+                            <svg
+                                class="icon-svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"
+                                ></path>
+                                <path
+                                    d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                                ></path>
+                            </svg>
+                            Education & Credentials
+                            <span class="required-mark">*</span>
+                        </label>
+                        <textarea
+                            id="education"
+                            name="education"
+                            placeholder="Ph.D. in Clinical Psychology, Harvard University; M.A. in Psychology, Stanford University"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>
+                            <svg
+                                class="icon-svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <rect
+                                    x="3"
+                                    y="4"
+                                    width="18"
+                                    height="18"
+                                    rx="2"
+                                    ry="2"
+                                ></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Available Days <span class="required-mark">*</span>
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="monday"
+                                    name="days"
+                                    value="Monday"
+                                />
+                                <label for="monday">Monday</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="tuesday"
+                                    name="days"
+                                    value="Tuesday"
+                                />
+                                <label for="tuesday">Tuesday</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="wednesday"
+                                    name="days"
+                                    value="Wednesday"
+                                />
+                                <label for="wednesday">Wednesday</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="thursday"
+                                    name="days"
+                                    value="Thursday"
+                                />
+                                <label for="thursday">Thursday</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="friday"
+                                    name="days"
+                                    value="Friday"
+                                />
+                                <label for="friday">Friday</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="saturday"
+                                    name="days"
+                                    value="Saturday"
+                                />
+                                <label for="saturday">Saturday</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="sunday"
+                                    name="days"
+                                    value="Sunday"
+                                />
+                                <label for="sunday">Sunday</label>
+                            </div>
+                        </div>
+                        <input
+                            type="hidden"
+                            id="available_days"
+                            name="available_days"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="image_url">
+                            <svg
+                                class="icon-svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <rect
+                                    x="3"
+                                    y="3"
+                                    width="18"
+                                    height="18"
+                                    rx="2"
+                                    ry="2"
+                                ></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            Profile Image URL (Optional)
+                        </label>
+                        <input
+                            type="url"
+                            id="image_url"
+                            name="image_url"
+                            placeholder="https://example.com/photo.jpg"
+                        />
+                        <span class="help-text"
+                            >Leave blank to use default avatar</span
+                        >
+                    </div>
+
+                    <div class="form-actions">
+                        <a
+                            href="{{ url_for('admin_professionals') }}"
+                            class="btn btn-secondary"
+                        >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Add Professional
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle available days checkboxes
+    const form = document.getElementById("professionalForm");
+    const checkboxes = document.querySelectorAll('input[name="days"]');
+    const hiddenInput = document.getElementById("available_days");
+
+    form.addEventListener("submit", function (e) {
+        const selectedDays = Array.from(checkboxes)
+            .filter((cb) => cb.checked)
+            .map((cb) => cb.value);
+
+        if (selectedDays.length === 0) {
+            e.preventDefault();
+            alert("Please select at least one available day.");
+            return;
+        }
+
+        hiddenInput.value = selectedDays.join(", ");
+    });
+
+    // Add visual feedback for inputs
+    const inputs = document.querySelectorAll("input, textarea");
+    inputs.forEach((input) => {
+        input.addEventListener("input", function () {
+            if (this.value.trim()) {
+                this.style.borderColor = "#c8956d";
+            } else {
+                this.style.borderColor = "#e0e0e0";
+            }
+        });
+    });
+</script>
+{% endblock %}

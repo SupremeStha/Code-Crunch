@@ -19,7 +19,7 @@
     }
 
     .success-container {
-        max-width: 800px;
+        max-width: 900px;
         margin: 0 auto;
         padding: 0 2rem;
     }
@@ -130,6 +130,41 @@
         padding: 3rem 2.5rem;
     }
 
+    .info-alert {
+        background: #e3f2fd;
+        border: 2px solid #90caf9;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .info-alert svg {
+        width: 24px;
+        height: 24px;
+        color: #1976d2;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .info-alert-content {
+        flex: 1;
+    }
+
+    .info-alert-content strong {
+        color: #0d47a1;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-alert-content p {
+        color: #1565c0;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
     .details-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
         border: 2px solid #e0e0e0;
@@ -158,6 +193,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .detail-row {
@@ -220,39 +256,48 @@
         }
     }
 
-    .info-alert {
-        background: #e3f2fd;
-        border: 2px solid #90caf9;
+    .professional-info {
+        background: #fff;
+        border: 2px solid #e0e0e0;
         border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 2rem;
+        padding: 1.5rem;
         display: flex;
-        align-items: flex-start;
-        gap: 1rem;
+        align-items: center;
+        gap: 1.5rem;
     }
 
-    .info-alert svg {
-        width: 24px;
-        height: 24px;
-        color: #1976d2;
+    .prof-avatar {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         flex-shrink: 0;
-        margin-top: 2px;
     }
 
-    .info-alert-content {
+    .prof-avatar svg {
+        width: 35px;
+        height: 35px;
+        color: white;
+    }
+
+    .prof-details {
         flex: 1;
     }
 
-    .info-alert-content strong {
-        color: #0d47a1;
-        display: block;
+    .prof-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
         margin-bottom: 0.25rem;
     }
 
-    .info-alert-content p {
-        color: #1565c0;
-        margin: 0;
-        font-size: 0.95rem;
+    .prof-title {
+        color: #b8860b;
+        font-size: 0.9rem;
+        font-weight: 600;
     }
 
     .action-buttons {
@@ -350,6 +395,11 @@
             width: 50px;
             height: 50px;
         }
+
+        .professional-info {
+            flex-direction: column;
+            text-align: center;
+        }
     }
 </style>
 
@@ -418,6 +468,19 @@
                         <div class="detail-row">
                             <strong>Appointment Time</strong>
                             <span>{{ appointment.time.strftime('%I:%M %p') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="professional-info">
+                        <div class="prof-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="prof-details">
+                            <div class="prof-name">{{ appointment.professional.name }}</div>
+                            <div class="prof-title">{{ appointment.professional.title }}</div>
                         </div>
                     </div>
                 </div>
