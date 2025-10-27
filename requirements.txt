@@ -10,3 +10,5 @@ flask-sqlalchemy>=3.0.0
 werkzeug>=2.3.0
 requests>=2.31.0
 typing-extensions>=4.7.0
+Flask-Mail==0.9.1
+Werkzeug==3.0.0

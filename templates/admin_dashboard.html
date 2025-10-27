@@ -38,6 +38,7 @@
         display: flex;
         gap: 1rem;
         align-items: center;
+        flex-wrap: wrap;
     }
 
     .btn {
@@ -67,6 +68,16 @@
     .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(200, 149, 109, 0.4);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        color: white;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
     }
 
     .btn-danger {
@@ -411,12 +422,11 @@
         }
 
         .header-actions {
-            flex-direction: column;
             width: 100%;
         }
 
         .btn {
-            width: 100%;
+            flex: 1;
             justify-content: center;
         }
 
@@ -473,6 +483,10 @@
         .dashboard-stats {
             grid-template-columns: 1fr;
         }
+
+        .header-actions {
+            flex-direction: column;
+        }
     }
 </style>
 
@@ -490,7 +504,13 @@
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Manage Professionals
+                    Professionals
+                </a>
+                <a href="{{ url_for('admin_reviews') }}" class="btn btn-warning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    Reviews
                 </a>
                 <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

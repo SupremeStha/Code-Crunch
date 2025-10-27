@@ -1,0 +1,737 @@
+{% extends "layout.html" %}
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .dashboard-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        padding: 3rem 0;
+    }
+
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Header */
+    .dashboard-header {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .user-welcome {
+        flex: 1;
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.9rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+    }
+
+    .btn-outline {
+        background: white;
+        color: #666;
+        border: 2px solid #e0e0e0;
+    }
+
+    .btn-outline:hover {
+        border-color: #c8956d;
+        color: #c8956d;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    }
+
+    .stat-card.upcoming {
+        --card-color: #3498db;
+        --card-color-light: #5dade2;
+    }
+
+    .stat-card.completed {
+        --card-color: #27ae60;
+        --card-color-light: #52be80;
+    }
+
+    .stat-card.cancelled {
+        --card-color: #e74c3c;
+        --card-color-light: #ec7063;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon svg {
+        width: 30px;
+        height: 30px;
+        color: white;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--card-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    /* Tabs */
+    .tabs-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .tabs-header {
+        display: flex;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 1.5rem;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .tab-btn.active {
+        color: #c8956d;
+    }
+
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #d4a574, #c8956d);
+    }
+
+    .tab-btn:hover:not(.active) {
+        color: #999;
+        background: #fafafa;
+    }
+
+    .tab-content {
+        display: none;
+        padding: 2rem;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Appointment Cards */
+    .appointments-list {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .appointment-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 2px solid #e0e0e0;
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .appointment-card:hover {
+        border-color: #c8956d;
+        box-shadow: 0 8px 25px rgba(200, 149, 109, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .appointment-id {
+        font-weight: 700;
+        color: #3498db;
+        font-size: 1.1rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-completed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .appointment-body {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1.5rem;
+    }
+
+    .prof-avatar-card {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .prof-avatar-card svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+    }
+
+    .appointment-details {
+        flex: 1;
+    }
+
+    .prof-name-card {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .prof-title-card {
+        color: #b8860b;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .detail-row svg {
+        width: 18px;
+        height: 18px;
+        color: #c8956d;
+        flex-shrink: 0;
+    }
+
+    .detail-row strong {
+        color: #2c3e50;
+    }
+
+    .appointment-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e0e0e0;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    .btn-danger {
+        background: #e74c3c;
+        color: white;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    .btn-success {
+        background: #27ae60;
+        color: white;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: #229954;
+        transform: translateY(-2px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #f0ebe5, #e8dcc8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .empty-icon svg {
+        width: 50px;
+        height: 50px;
+        color: #c8956d;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state p {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 0 1rem;
+        }
+
+        .dashboard-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 1.75rem;
+        }
+
+        .header-actions {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .appointment-body {
+            grid-template-columns: 1fr;
+        }
+
+        .prof-avatar-card {
+            margin: 0 auto;
+        }
+
+        .appointment-details {
+            text-align: center;
+        }
+
+        .detail-row {
+            justify-content: center;
+        }
+
+        .appointment-actions {
+            flex-direction: column;
+        }
+
+        .btn-sm {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="dashboard-page">
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="user-welcome">
+                <h1 class="welcome-title">Welcome back, {{ user.name }}! 👋</h1>
+                <p class="welcome-subtitle">Manage your appointments and track your mental health journey</p>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('professionals') }}" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Book Appointment
+                </a>
+                <a href="{{ url_for('user_profile') }}" class="btn btn-outline">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    My Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card upcoming">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <div class="stat-number">{{ upcoming_appointments|length }}</div>
+                <div class="stat-label">Upcoming Appointments</div>
+            </div>
+
+            <div class="stat-card completed">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-number">{{ past_appointments|selectattr("status", "equalto", "Completed")|list|length }}</div>
+                <div class="stat-label">Completed Sessions</div>
+            </div>
+
+            <div class="stat-card cancelled">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <div class="stat-number">{{ past_appointments|selectattr("status", "equalto", "Cancelled")|list|length }}</div>
+                <div class="stat-label">Cancelled</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('upcoming')">Upcoming Appointments</button>
+                <button class="tab-btn" onclick="showTab('past')">Past Appointments</button>
+            </div>
+
+            <!-- Upcoming Appointments Tab -->
+            <div id="upcoming-tab" class="tab-content active">
+                {% if upcoming_appointments %}
+                <div class="appointments-list">
+                    {% for appt in upcoming_appointments %}
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <span class="appointment-id">#{{ appt.id }}</span>
+                            <span class="status-badge status-{{ appt.status.lower() }}">{{ appt.status }}</span>
+                        </div>
+                        <div class="appointment-body">
+                            <div class="prof-avatar-card">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="appointment-details">
+                                <div class="prof-name-card">{{ appt.professional.name }}</div>
+                                <div class="prof-title-card">{{ appt.professional.title }}</div>
+                                <div class="detail-row">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <span><strong>Date:</strong> {{ appt.date.strftime('%B %d, %Y') }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span><strong>Time:</strong> {{ appt.time.strftime('%I:%M %p') }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                    <span><strong>Service:</strong> {{ appt.service }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-actions">
+                            <a href="{{ url_for('view_appointment', appt_id=appt.id) }}" class="btn btn-outline btn-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                View Details
+                            </a>
+                            {% if appt.status not in ['Cancelled', 'Completed'] %}
+                            <form method="POST" action="{{ url_for('cancel_appointment', appt_id=appt.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                    </svg>
+                                    Cancel
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <h3>No Upcoming Appointments</h3>
+                    <p>You don't have any scheduled appointments. Book one now to get started!</p>
+                    <a href="{{ url_for('professionals') }}" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Book Appointment
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Past Appointments Tab -->
+            <div id="past-tab" class="tab-content">
+                {% if past_appointments %}
+                <div class="appointments-list">
+                    {% for appt in past_appointments %}
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <span class="appointment-id">#{{ appt.id }}</span>
+                            <span class="status-badge status-{{ appt.status.lower() }}">{{ appt.status }}</span>
+                        </div>
+                        <div class="appointment-body">
+                            <div class="prof-avatar-card">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="appointment-details">
+                                <div class="prof-name-card">{{ appt.professional.name }}</div>
+                                <div class="prof-title-card">{{ appt.professional.title }}</div>
+                                <div class="detail-row">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <span><strong>Date:</strong> {{ appt.date.strftime('%B %d, %Y') }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span><strong>Time:</strong> {{ appt.time.strftime('%I:%M %p') }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                    <span><strong>Service:</strong> {{ appt.service }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-actions">
+                            <a href="{{ url_for('view_appointment', appt_id=appt.id) }}" class="btn btn-outline btn-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                View Details
+                            </a>
+                            {% if appt.status == 'Completed' and not appt.review %}
+                            <a href="{{ url_for('leave_review', appt_id=appt.id) }}" class="btn btn-success btn-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                Leave Review
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20M2 12h20"></path>
+                        </svg>
+                    </div>
+                    <h3>No Past Appointments</h3>
+                    <p>Your appointment history will appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Show selected tab
+        document.getElementById(tabName + '-tab').classList.add('active');
+        event.target.classList.add('active');
+    }
+</script>
+{% endblock %}

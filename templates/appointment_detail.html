@@ -1,0 +1,387 @@
+
+<!-- APPOINTMENT DETAIL TEMPLATE (appointment_detail.html) -->
+{% extends "layout.html" %}
+{% block title %}Appointment #{{ appointment.id }}{% endblock %}
+
+{% block content %}
+<style>
+    .detail-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        padding: 3rem 2rem;
+    }
+
+    .detail-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #c8956d;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        gap: 0.75rem;
+    }
+
+    .back-link svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .appointment-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+        padding: 2.5rem;
+        text-align: center;
+    }
+
+    .appointment-id-large {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-body {
+        padding: 3rem;
+    }
+
+    .status-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 16px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .status-badge-large {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 25px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-completed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .professional-section {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #fdfaf7 0%, #f8f3ed 100%);
+        border-radius: 16px;
+        margin-bottom: 2rem;
+    }
+
+    .prof-avatar-detail {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .prof-avatar-detail svg {
+        width: 50px;
+        height: 50px;
+        color: white;
+    }
+
+    .prof-info h2 {
+        font-size: 1.75rem;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .prof-info p {
+        color: #b8860b;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-item {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border-left: 4px solid #c8956d;
+    }
+
+    .detail-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .detail-label svg {
+        width: 18px;
+        height: 18px;
+        color: #c8956d;
+    }
+
+    .detail-value {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .message-section {
+        background: #e3f2fd;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #2196f3;
+        margin-bottom: 2rem;
+    }
+
+    .message-section h3 {
+        color: #1565c0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+    }
+
+    .message-section p {
+        color: #1976d2;
+        line-height: 1.7;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+    }
+
+    .btn-danger {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .detail-container {
+            padding: 0 1rem;
+        }
+
+        .professional-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="detail-page">
+    <div class="detail-container">
+        <a href="{{ url_for('user_dashboard') }}" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Dashboard
+        </a>
+
+        <div class="appointment-card">
+            <div class="card-header">
+                <div class="appointment-id-large">#{{ appointment.id }}</div>
+                <p>Appointment Details</p>
+            </div>
+
+            <div class="card-body">
+                <div class="status-section">
+                    <span class="status-badge-large status-{{ appointment.status.lower() }}">
+                        {{ appointment.status }}
+                    </span>
+                </div>
+
+                <div class="professional-section">
+                    <div class="prof-avatar-detail">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="prof-info">
+                        <h2>{{ appointment.professional.name }}</h2>
+                        <p>{{ appointment.professional.title }}</p>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Appointment Date
+                        </div>
+                        <div class="detail-value">{{ appointment.date.strftime('%B %d, %Y') }}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Appointment Time
+                        </div>
+                        <div class="detail-value">{{ appointment.time.strftime('%I:%M %p') }}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            Service Type
+                        </div>
+                        <div class="detail-value">{{ appointment.service }}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Booked On
+                        </div>
+                        <div class="detail-value">{{ appointment.created_at.strftime('%b %d, %Y') }}</div>
+                    </div>
+                </div>
+
+                {% if appointment.message %}
+                <div class="message-section">
+                    <h3>Additional Notes</h3>
+                    <p>{{ appointment.message }}</p>
+                </div>
+                {% endif %}
+
+                <div class="actions">
+                    <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                    {% if appointment.status not in ['Cancelled', 'Completed'] %}
+                    <form method="POST" action="{{ url_for('cancel_appointment', appt_id=appointment.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                            Cancel Appointment
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -112,6 +112,12 @@
                 font-weight: 600;
             }
 
+            .nav-buttons {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+            }
+
             .sign-in-btn {
                 background-color: #000;
                 color: #ffffff;
@@ -147,6 +153,38 @@
             .sign-in-btn:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+                color: #fff;
+            }
+
+            .user-menu {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .user-welcome {
+                color: #4a5568;
+                font-size: 0.9rem;
+                font-weight: 500;
+            }
+
+            .logout-btn {
+                background-color: #e53e3e;
+                color: #ffffff;
+                padding: 0.5rem 1.2rem;
+                border-radius: 8px;
+                border: none;
+                cursor: pointer;
+                font-size: 0.85rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            .logout-btn:hover {
+                background-color: #c53030;
+                transform: translateY(-1px);
                 color: #fff;
             }
 
@@ -313,9 +351,22 @@
                     border-bottom: none;
                 }
 
-                .sign-in-btn {
+                .nav-buttons {
+                    flex-direction: column;
                     width: 100%;
-                    margin-top: 1rem;
+                    gap: 0.5rem;
+                }
+
+                .sign-in-btn, .logout-btn {
+                    width: 100%;
+                    margin-top: 0.5rem;
+                    text-align: center;
+                }
+
+                .user-menu {
+                    flex-direction: column;
+                    width: 100%;
+                    text-align: center;
                 }
 
                 main {
@@ -456,7 +507,7 @@
                     <a
                         href="{{ url_for('professionals') }}"
                         class="{{ 'active' if request.endpoint == 'professionals' else '' }}"
-                        >Schedule Appointment</a
+                        >Professionals</a
                     >
                 </li>
                 <li>
@@ -466,8 +517,37 @@
                         >Check Status</a
                     >
                 </li>
+                
+                <!-- User-specific links (only show when logged in) -->
+                {% if session.user_id %}
+                <li>
+                    <a
+                        href="{{ url_for('user_dashboard') }}"
+                        class="{{ 'active' if request.endpoint == 'user_dashboard' else '' }}"
+                        >My Dashboard</a
+                    >
+                </li>
+                {% endif %}
             </ul>
-            <a href="{{ url_for('admin_login') }}" class="sign-in-btn">Admin</a>
+
+            <div class="nav-buttons">
+                {% if session.user_id %}
+                    <!-- Show when user is logged in -->
+                    <div class="user-menu">
+                        <span class="user-welcome">Welcome, {{ session.user_name }}</span>
+                        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+                    </div>
+                {% else %}
+                    <!-- Show when user is not logged in -->
+                    <div class="user-menu">
+                        <a href="{{ url_for('login') }}" class="sign-in-btn">Sign In</a>
+                        <a href="{{ url_for('register') }}" class="sign-in-btn" style="background-color: #925429;">Register</a>
+                    </div>
+                {% endif %}
+                
+                <!-- Admin button (always visible) -->
+                <a href="{{ url_for('admin_login') }}" class="sign-in-btn" style="background-color: #2d3748;">Admin</a>
+            </div>
         </nav>
 
         <!-- Main Content -->
@@ -490,9 +570,15 @@
                     <h4>Quick Links</h4>
                     <ul class="footer-links">
                         <li><a href="{{ url_for('index') }}">Home</a></li>
-                        <li><a href="{{ url_for('book_appointment') }}">Book Appointment</a></li>
-                        <li><a href="{{ url_for('check_status') }}">Check Status</a></li>
+                        <li><a href="{{ url_for('professionals') }}">Find Professionals</a></li>
                         <li><a href="{{ url_for('ai_assessment') }}">AI Assessment</a></li>
+                        <li><a href="{{ url_for('check_status') }}">Check Status</a></li>
+                        {% if session.user_id %}
+                        <li><a href="{{ url_for('user_dashboard') }}">My Dashboard</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('login') }}">Sign In</a></li>
+                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                        {% endif %}
                     </ul>
                 </div>
                 <div class="footer-section">

@@ -1,0 +1,230 @@
+<!-- ========================================== -->
+<!-- REGISTER TEMPLATE (register.html) -->
+<!-- ========================================== -->
+
+{% extends "layout.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<style>
+    .auth-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .auth-container {
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, #27ae60, #229954);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+
+    .auth-icon {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .auth-icon svg {
+        width: 40px;
+        height: 40px;
+        color: #27ae60;
+    }
+
+    .auth-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+        opacity: 0.95;
+    }
+
+    .auth-body {
+        padding: 2.5rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #27ae60, #229954);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #666;
+    }
+
+    .auth-footer a {
+        color: #27ae60;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                </div>
+                <h1>Create Account</h1>
+                <p>Join us to start your mental health journey</p>
+            </div>
+
+            <div class="auth-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1234567890" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Min 6 characters" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth">Create Account</button>
+                </form>
+
+                <div class="auth-footer">
+                    Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

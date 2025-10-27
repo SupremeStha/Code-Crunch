@@ -1,16 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, date, time
-from chatbot import MentalHealthChatbot
+from flask_mail import Mail, Message
+from email_service import init_mail, send_appointment_confirmation
+from datetime import datetime, date, time, timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 import secrets
 import os
+
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+init_mail(app)
+
+# Email configuration
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
 
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 # Store chatbot instances per session
 chatbots = {}
@@ -18,6 +35,29 @@ chatbots = {}
 # ============================================
 # DATABASE MODELS
 # ============================================
+class User(db.Model):
+    """User model for patient accounts"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    # Relationships
+    appointments = db.relationship('Appointment', backref='user', lazy=True)
+    reviews = db.relationship('Review', backref='user', lazy=True)
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        return f'<User {self.email}>'
+
 class Professional(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -28,36 +68,191 @@ class Professional(db.Model):
     education = db.Column(db.Text, nullable=False)
     languages = db.Column(db.String(200), nullable=False)
     image_url = db.Column(db.String(200), default='default-avatar.jpg')
-    available_days = db.Column(db.String(200), nullable=False)  # JSON string of available days
+    available_days = db.Column(db.String(200), nullable=False)
     rating = db.Column(db.Float, default=5.0)
     total_reviews = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     appointments = db.relationship('Appointment', backref='professional', lazy=True)
+    reviews = db.relationship('Review', backref='professional', lazy=True)
+
+    def update_rating(self):
+        """Recalculate average rating from reviews"""
+        reviews = Review.query.filter_by(professional_id=self.id, is_approved=True).all()
+        if reviews:
+            self.rating = sum(r.rating for r in reviews) / len(reviews)
+            self.total_reviews = len(reviews)
+        else:
+            self.rating = 5.0
+            self.total_reviews = 0
 
     def __repr__(self):
         return f'<Professional {self.name}>'
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    
+    # User info (can be guest or registered user)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     user_name = db.Column(db.String(100), nullable=False)
     user_email = db.Column(db.String(120), nullable=False)
     user_phone = db.Column(db.String(20), nullable=False)
-    service = db.Column(db.String(100), nullable=False)
+    
+    # Appointment details
     professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
+    service = db.Column(db.String(100), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
     message = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default='Pending')
+    
+    # Notifications
+    confirmation_sent = db.Column(db.Boolean, default=False)
+    reminder_sent = db.Column(db.Boolean, default=False)
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship
+    review = db.relationship('Review', backref='appointment', uselist=False, lazy=True)
 
     def __repr__(self):
         return f'<Appointment {self.user_name} - {self.date} {self.time}>'
 
-# Admin credentials (in production, use proper authentication)
+class Review(db.Model):
+    """Review and rating model"""
+    id = db.Column(db.Integer, primary_key=True)
+    
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=False)
+    
+    rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
+    comment = db.Column(db.Text, nullable=True)
+    is_approved = db.Column(db.Boolean, default=True)
+    is_anonymous = db.Column(db.Boolean, default=False)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Review {self.rating} stars for Professional {self.professional_id}>'
+
+# Admin credentials
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'password123'
+
+# ============================================
+# DECORATORS
+# ============================================
+def login_required(f):
+    """Decorator to require login for certain routes"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# ============================================
+# EMAIL FUNCTIONS
+# ============================================
+def send_appointment_confirmation(appointment):
+    """Send appointment confirmation email"""
+    try:
+        subject = f"Appointment Confirmation - #{appointment.id}"
+        html_body = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #d4a574, #c8956d); color: white; padding: 30px; text-align: center;">
+                <h1>🎉 Appointment Confirmed!</h1>
+            </div>
+            <div style="padding: 30px; background: #f9f9f9;">
+                <p>Dear {appointment.user_name},</p>
+                <p>Your appointment has been scheduled successfully!</p>
+                <div style="background: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h3 style="color: #c8956d;">Appointment Details</h3>
+                    <p><strong>ID:</strong> #{appointment.id}</p>
+                    <p><strong>Professional:</strong> {appointment.professional.name}</p>
+                    <p><strong>Date:</strong> {appointment.date.strftime('%B %d, %Y')}</p>
+                    <p><strong>Time:</strong> {appointment.time.strftime('%I:%M %p')}</p>
+                    <p><strong>Service:</strong> {appointment.service}</p>
+                    <p><strong>Status:</strong> {appointment.status}</p>
+                </div>
+                <p>Please arrive 5-10 minutes before your scheduled time.</p>
+            </div>
+        </div>
+        """
+        
+        msg = Message(subject, recipients=[appointment.user_email])
+        msg.html = html_body
+        mail.send(msg)
+        
+        appointment.confirmation_sent = True
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(f"Error sending confirmation email: {str(e)}")
+        return False
+
+def send_status_update_email(appointment, old_status, new_status):
+    """Send email when appointment status changes"""
+    try:
+        subject = f"Appointment Status Update - #{appointment.id}"
+        html_body = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #27ae60; color: white; padding: 30px; text-align: center;">
+                <h1>Status Updated</h1>
+            </div>
+            <div style="padding: 30px; background: #f9f9f9;">
+                <p>Dear {appointment.user_name},</p>
+                <p>Your appointment status has been updated:</p>
+                <p><strong>Previous Status:</strong> {old_status}</p>
+                <p><strong>New Status:</strong> {new_status}</p>
+                <p><strong>Appointment ID:</strong> #{appointment.id}</p>
+                <p><strong>Date:</strong> {appointment.date.strftime('%B %d, %Y')} at {appointment.time.strftime('%I:%M %p')}</p>
+            </div>
+        </div>
+        """
+        
+        msg = Message(subject, recipients=[appointment.user_email])
+        msg.html = html_body
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending status update email: {str(e)}")
+        return False
+
+def send_review_request_email(appointment):
+    """Send email requesting review after completed appointment"""
+    try:
+        subject = "How was your session? Leave a review"
+        html_body = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #ffc107, #ff9800); color: white; padding: 30px; text-align: center;">
+                <h1>⭐ Share Your Experience</h1>
+            </div>
+            <div style="padding: 30px; background: #f9f9f9;">
+                <p>Dear {appointment.user_name},</p>
+                <p>Thank you for your session with {appointment.professional.name}!</p>
+                <p>Your feedback helps others find the right professional. Please take a moment to leave a review.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="http://localhost:5000/leave-review/{appointment.id}" 
+                       style="background: linear-gradient(135deg, #ffc107, #ff9800); color: white; 
+                              padding: 15px 30px; text-decoration: none; border-radius: 10px; 
+                              display: inline-block; font-weight: bold;">Leave a Review</a>
+                </div>
+            </div>
+        </div>
+        """
+        
+        msg = Message(subject, recipients=[appointment.user_email])
+        msg.html = html_body
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending review request email: {str(e)}")
+        return False
 
 # ============================================
 # MAIN ROUTES
@@ -65,6 +260,163 @@ ADMIN_PASSWORD = 'password123'
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# ============================================
+# USER AUTHENTICATION ROUTES
+# ============================================
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """User registration"""
+    if request.method == 'POST':
+        try:
+            name = request.form['name']
+            email = request.form['email']
+            phone = request.form['phone']
+            password = request.form['password']
+            confirm_password = request.form['confirm_password']
+            
+            if not all([name, email, phone, password]):
+                flash('All fields are required.', 'danger')
+                return render_template('register.html')
+            
+            if password != confirm_password:
+                flash('Passwords do not match.', 'danger')
+                return render_template('register.html')
+            
+            if len(password) < 6:
+                flash('Password must be at least 6 characters.', 'danger')
+                return render_template('register.html')
+            
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                flash('Email already registered. Please login.', 'danger')
+                return redirect(url_for('login'))
+            
+            user = User(name=name, email=email, phone=phone)
+            user.set_password(password)
+            
+            db.session.add(user)
+            db.session.commit()
+            
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('login'))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error during registration: {str(e)}")
+            flash('An error occurred. Please try again.', 'danger')
+    
+    return render_template('register.html')
+
+@app.route('/profile')
+@login_required
+def user_profile():
+    """User profile page"""
+    user_id = session.get('user_id')
+    user = User.query.get_or_404(user_id)
+    
+    return render_template('user_profile.html', user=user)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """User login"""
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and user.check_password(password):
+            session['user_id'] = user.id
+            session['user_name'] = user.name
+            session['user_email'] = user.email
+            
+            flash(f'Welcome back, {user.name}!', 'success')
+            
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('user_dashboard'))
+        else:
+            flash('Invalid email or password.', 'danger')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """User logout"""
+    user_name = session.get('user_name', 'User')
+    session.pop('user_id', None)
+    session.pop('user_name', None)
+    session.pop('user_email', None)
+    
+    flash(f'Goodbye, {user_name}! You have been logged out.', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/dashboard')
+@login_required
+def user_dashboard():
+    """User dashboard - view appointments"""
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    
+    appointments = Appointment.query.filter_by(user_id=user_id).order_by(
+        Appointment.date.desc(),
+        Appointment.time.desc()
+    ).all()
+    
+    today = date.today()
+    upcoming = [a for a in appointments if a.date >= today and a.status not in ['Cancelled', 'Completed']]
+    past = [a for a in appointments if a.date < today or a.status in ['Cancelled', 'Completed']]
+    
+    return render_template('user_dashboard.html', 
+                         user=user, 
+                         upcoming_appointments=upcoming,
+                         past_appointments=past)
+
+@app.route('/appointment/<int:appt_id>')
+@login_required
+def view_appointment(appt_id):
+    """View appointment details"""
+    user_id = session.get('user_id')
+    appointment = Appointment.query.get_or_404(appt_id)
+    
+    if appointment.user_id != user_id:
+        flash('You do not have permission to view this appointment.', 'danger')
+        return redirect(url_for('user_dashboard'))
+    
+    return render_template('appointment_detail.html', appointment=appointment)
+
+@app.route('/appointment/<int:appt_id>/cancel', methods=['POST'])
+@login_required
+def cancel_appointment(appt_id):
+    """Cancel an appointment"""
+    user_id = session.get('user_id')
+    appointment = Appointment.query.get_or_404(appt_id)
+    
+    if appointment.user_id != user_id:
+        flash('You do not have permission to cancel this appointment.', 'danger')
+        return redirect(url_for('user_dashboard'))
+    
+    appointment_datetime = datetime.combine(appointment.date, appointment.time)
+    now = datetime.now()
+    
+    if appointment_datetime < now:
+        flash('Cannot cancel past appointments.', 'danger')
+        return redirect(url_for('user_dashboard'))
+    
+    if (appointment_datetime - now) < timedelta(hours=24):
+        flash('Appointments must be cancelled at least 24 hours in advance.', 'warning')
+        return redirect(url_for('user_dashboard'))
+    
+    old_status = appointment.status
+    appointment.status = 'Cancelled'
+    appointment.updated_at = datetime.utcnow()
+    
+    db.session.commit()
+    
+    send_status_update_email(appointment, old_status, 'Cancelled')
+    
+    flash('Appointment cancelled successfully.', 'success')
+    return redirect(url_for('user_dashboard'))
 
 # ============================================
 # PROFESSIONAL ROUTES
@@ -79,7 +431,81 @@ def professionals():
 def professional_detail(prof_id):
     """Display detailed profile of a professional"""
     prof = Professional.query.get_or_404(prof_id)
-    return render_template('professional_detail.html', professional=prof)
+    
+    reviews = Review.query.filter_by(
+        professional_id=prof_id,
+        is_approved=True
+    ).order_by(Review.created_at.desc()).limit(5).all()
+    
+    return render_template('professional_detail.html', professional=prof, reviews=reviews)
+
+@app.route('/professional/<int:prof_id>/reviews')
+def professional_reviews(prof_id):
+    """View all reviews for a professional"""
+    professional = Professional.query.get_or_404(prof_id)
+    
+    reviews = Review.query.filter_by(
+        professional_id=prof_id,
+        is_approved=True
+    ).order_by(Review.created_at.desc()).all()
+    
+    return render_template('professional_reviews.html', 
+                         professional=professional,
+                         reviews=reviews)
+
+# ============================================
+# REVIEW ROUTES
+# ============================================
+@app.route('/leave-review/<int:appt_id>', methods=['GET', 'POST'])
+def leave_review(appt_id):
+    """Leave a review for a completed appointment"""
+    appointment = Appointment.query.get_or_404(appt_id)
+    
+    if appointment.status != 'Completed':
+        flash('You can only review completed appointments.', 'warning')
+        return redirect(url_for('index'))
+    
+    existing_review = Review.query.filter_by(appointment_id=appt_id).first()
+    if existing_review:
+        flash('You have already reviewed this appointment.', 'info')
+        return redirect(url_for('professional_detail', prof_id=appointment.professional_id))
+    
+    if request.method == 'POST':
+        try:
+            rating = int(request.form['rating'])
+            comment = request.form.get('comment', '').strip()
+            is_anonymous = 'is_anonymous' in request.form
+            
+            if rating < 1 or rating > 5:
+                flash('Please provide a rating between 1 and 5 stars.', 'danger')
+                return render_template('leave_review.html', appointment=appointment)
+            
+            review = Review(
+                user_id=appointment.user_id,
+                professional_id=appointment.professional_id,
+                appointment_id=appointment.id,
+                rating=rating,
+                comment=comment if comment else None,
+                is_anonymous=is_anonymous,
+                is_approved=True
+            )
+            
+            db.session.add(review)
+            
+            professional = Professional.query.get(appointment.professional_id)
+            professional.update_rating()
+            
+            db.session.commit()
+            
+            flash('Thank you for your review! Your feedback helps others.', 'success')
+            return redirect(url_for('professional_detail', prof_id=appointment.professional_id))
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error submitting review: {str(e)}")
+            flash('An error occurred. Please try again.', 'danger')
+    
+    return render_template('leave_review.html', appointment=appointment)
 
 # ============================================
 # CHATBOT ROUTES
@@ -99,14 +525,14 @@ def chat():
         if not user_message.strip():
             return jsonify({'error': 'Empty message'}), 400
         
-        # Get or create chatbot for this session
         session_id = session.get('chatbot_session_id')
         if not session_id:
             session_id = secrets.token_hex(8)
             session['chatbot_session_id'] = session_id
         
         if session_id not in chatbots:
-            chatbots[session_id] = MentalHealthChatbot()
+            # Create a simple chatbot if MentalHealthChatbot is not available
+            chatbots[session_id] = SimpleChatbot()
         
         chatbot = chatbots[session_id]
         response = chatbot.get_response(user_message)
@@ -130,6 +556,30 @@ def reset_chat():
         print(f"Error in reset endpoint: {str(e)}")
         return jsonify({'error': 'An error occurred resetting the conversation'}), 500
 
+# Simple chatbot implementation as fallback
+class SimpleChatbot:
+    def __init__(self):
+        self.conversation_history = []
+    
+    def get_response(self, message):
+        message_lower = message.lower()
+        
+        if any(word in message_lower for word in ['hello', 'hi', 'hey']):
+            return "Hello! I'm here to help with mental health support. How are you feeling today?"
+        elif any(word in message_lower for word in ['sad', 'depressed', 'unhappy']):
+            return "I'm sorry to hear you're feeling this way. It's important to talk about these feelings. Have you considered speaking with a mental health professional?"
+        elif any(word in message_lower for word in ['anxious', 'anxiety', 'worried']):
+            return "Anxiety can be challenging. Deep breathing exercises and mindfulness can help. Would you like me to help you find a professional to talk to?"
+        elif any(word in message_lower for word in ['stress', 'stressed']):
+            return "Stress affects many people. Remember to take breaks and practice self-care. Our professionals can teach you coping strategies."
+        elif any(word in message_lower for word in ['thank', 'thanks']):
+            return "You're welcome! Remember, seeking help is a sign of strength. Would you like to book an appointment with one of our professionals?"
+        else:
+            return "Thank you for sharing. I'm here to listen and help connect you with mental health resources. Would you like to learn more about our services or book an appointment?"
+
+    def reset_conversation(self):
+        self.conversation_history = []
+
 # ============================================
 # APPOINTMENT ROUTES
 # ============================================
@@ -145,7 +595,6 @@ def book_with_professional(prof_id):
     
     if request.method == 'POST':
         try:
-            # Get form data
             name = request.form['name']
             email = request.form['email']
             phone = request.form['phone']
@@ -154,11 +603,9 @@ def book_with_professional(prof_id):
             time_str = request.form['time']
             message = request.form.get('message', '')
 
-            # Convert date and time strings to proper objects
             appointment_date = datetime.strptime(date_str, '%Y-%m-%d').date()
             appointment_time = datetime.strptime(time_str, '%H:%M').time()
 
-            # Check if the slot is already booked with this professional
             existing = Appointment.query.filter_by(
                 professional_id=prof_id,
                 date=appointment_date,
@@ -171,8 +618,10 @@ def book_with_professional(prof_id):
                                      professional=professional, 
                                      today=date.today().isoformat())
 
-            # Create new appointment
+            user_id = session.get('user_id')
+
             appointment = Appointment(
+                user_id=user_id,
                 user_name=name,
                 user_email=email,
                 user_phone=phone,
@@ -186,15 +635,15 @@ def book_with_professional(prof_id):
             db.session.add(appointment)
             db.session.commit()
 
-            flash('Appointment booked successfully! You will receive a confirmation email soon.', 'success')
+            send_appointment_confirmation(appointment)
+
+            flash('Appointment booked successfully! Check your email for confirmation.', 'success')
             return redirect(url_for('booking_success', appt_id=appointment.id))
 
         except Exception as e:
+            db.session.rollback()
             print(f"Error booking appointment: {str(e)}")
             flash('Error booking appointment. Please try again.', 'error')
-            return render_template('book.html', 
-                                 professional=professional, 
-                                 today=date.today().isoformat())
 
     return render_template('book.html', 
                          professional=professional, 
@@ -220,7 +669,6 @@ def check_status():
                 user_email=email
             ).first()
         else:
-            # Get the most recent appointment for this email
             appointment = Appointment.query.filter_by(
                 user_email=email
             ).order_by(Appointment.created_at.desc()).first()
@@ -254,7 +702,6 @@ def admin_dashboard():
     if not session.get('admin'):
         return redirect(url_for('admin_login'))
     
-    # Get all appointments, ordered by date and time
     appointments = Appointment.query.order_by(
         Appointment.date.asc(),
         Appointment.time.asc()
@@ -279,14 +726,14 @@ def add_professional():
     
     if request.method == 'POST':
         try:
-            # Validate required fields
             required_fields = ['name', 'title', 'specialization', 'bio', 'experience_years', 'education', 'languages', 'available_days']
+            
+            # Check if all required fields are filled
             for field in required_fields:
                 if not request.form.get(field):
                     flash(f'Please fill in all required fields.', 'danger')
                     return render_template('admin_add_professional.html')
             
-            # Create new professional
             professional = Professional(
                 name=request.form['name'],
                 title=request.form['title'],
@@ -296,10 +743,10 @@ def add_professional():
                 education=request.form['education'],
                 languages=request.form['languages'],
                 available_days=request.form['available_days'],
-                image_url=request.form.get('image_url', 'default-avatar.jpg') if request.form.get('image_url') else 'default-avatar.jpg',
-                rating=5.0,  # Default rating
-                total_reviews=0,  # Start with 0 reviews
-                is_active=True  # Active by default
+                image_url=request.form.get('image_url', 'default-avatar.jpg'),
+                rating=5.0,
+                total_reviews=0,
+                is_active=True
             )
             
             db.session.add(professional)
@@ -319,33 +766,6 @@ def add_professional():
     
     return render_template('admin_add_professional.html')
 
-@app.route('/admin/update-status/<int:appt_id>', methods=['POST'])
-def update_status(appt_id):
-    """Update appointment status"""
-    if not session.get('admin'):
-        return redirect(url_for('admin_login'))
-    
-    appointment = Appointment.query.get_or_404(appt_id)
-    new_status = request.form['status']
-    appointment.status = new_status
-    db.session.commit()
-    
-    flash(f'Appointment status updated to {new_status}', 'success')
-    return redirect(url_for('admin_dashboard'))
-
-@app.route('/admin/delete/<int:appt_id>')
-def delete_appointment(appt_id):
-    """Delete an appointment"""
-    if not session.get('admin'):
-        return redirect(url_for('admin_login'))
-    
-    appointment = Appointment.query.get_or_404(appt_id)
-    db.session.delete(appointment)
-    db.session.commit()
-    
-    flash('Appointment deleted successfully', 'success')
-    return redirect(url_for('admin_dashboard'))
-
 @app.route('/admin/professional/edit/<int:prof_id>', methods=['GET', 'POST'])
 def edit_professional(prof_id):
     """Edit an existing professional"""
@@ -356,14 +776,12 @@ def edit_professional(prof_id):
     
     if request.method == 'POST':
         try:
-            # Validate required fields
             required_fields = ['name', 'title', 'specialization', 'bio', 'experience_years', 'education', 'languages', 'available_days']
             for field in required_fields:
                 if not request.form.get(field):
                     flash(f'Please fill in all required fields.', 'danger')
                     return render_template('admin_edit_professional.html', professional=professional)
             
-            # Update professional
             professional.name = request.form['name']
             professional.title = request.form['title']
             professional.specialization = request.form['specialization']
@@ -373,13 +791,11 @@ def edit_professional(prof_id):
             professional.languages = request.form['languages']
             professional.available_days = request.form['available_days']
             
-            # Update image URL if provided
             if request.form.get('image_url'):
                 professional.image_url = request.form['image_url']
             else:
                 professional.image_url = 'default-avatar.jpg'
             
-            # Update status - checkbox is present only when checked
             professional.is_active = 'is_active' in request.form
             
             db.session.commit()
@@ -407,11 +823,10 @@ def delete_professional(prof_id):
     try:
         professional = Professional.query.get_or_404(prof_id)
         
-        # Check if professional has any appointments
         appointment_count = Appointment.query.filter_by(professional_id=prof_id).count()
         
         if appointment_count > 0:
-            flash(f'Cannot delete {professional.name}. They have {appointment_count} appointment(s) associated with them. Please reassign or delete those appointments first.', 'danger')
+            flash(f'Cannot delete {professional.name}. They have {appointment_count} appointment(s) associated with them.', 'danger')
             return redirect(url_for('admin_professionals'))
         
         db.session.delete(professional)
@@ -426,26 +841,113 @@ def delete_professional(prof_id):
         flash('Error deleting professional. Please try again.', 'danger')
         return redirect(url_for('admin_professionals'))
 
-@app.route('/admin/professional/toggle/<int:prof_id>')
-def toggle_professional_status(prof_id):
-    """Toggle professional active/inactive status"""
+@app.route('/admin/update-status/<int:appt_id>', methods=['POST'])
+def update_status(appt_id):
+    """Update appointment status"""
     if not session.get('admin'):
         return redirect(url_for('admin_login'))
     
     try:
-        professional = Professional.query.get_or_404(prof_id)
-        professional.is_active = not professional.is_active
+        appointment = Appointment.query.get_or_404(appt_id)
+        old_status = appointment.status
+        new_status = request.form['status']
+        
+        appointment.status = new_status
+        appointment.updated_at = datetime.utcnow()
+        
         db.session.commit()
         
-        status = "activated" if professional.is_active else "deactivated"
-        flash(f'Professional {professional.name} {status} successfully!', 'success')
-        return redirect(url_for('admin_professionals'))
+        send_status_update_email(appointment, old_status, new_status)
+        
+        if new_status == 'Completed':
+            send_review_request_email(appointment)
+        
+        flash(f'Appointment status updated to {new_status}', 'success')
         
     except Exception as e:
         db.session.rollback()
-        print(f"Error toggling professional status: {str(e)}")
-        flash('Error updating professional status. Please try again.', 'danger')
-        return redirect(url_for('admin_professionals'))
+        print(f"Error updating status: {str(e)}")
+        flash('Error updating status. Please try again.', 'danger')
+    
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/delete/<int:appt_id>')
+def delete_appointment(appt_id):
+    """Delete an appointment"""
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+    
+    try:
+        appointment = Appointment.query.get_or_404(appt_id)
+        db.session.delete(appointment)
+        db.session.commit()
+        
+        flash('Appointment deleted successfully', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting appointment: {str(e)}")
+        flash('Error deleting appointment. Please try again.', 'danger')
+    
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/reviews')
+def admin_reviews():
+    """Admin page to moderate reviews"""
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+    
+    reviews = Review.query.order_by(Review.created_at.desc()).all()
+    
+    return render_template('admin_reviews.html', reviews=reviews)
+
+@app.route('/admin/review/<int:review_id>/approve', methods=['POST'])
+def approve_review(review_id):
+    """Approve a review"""
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+    
+    try:
+        review = Review.query.get_or_404(review_id)
+        review.is_approved = True
+        
+        professional = Professional.query.get(review.professional_id)
+        professional.update_rating()
+        
+        db.session.commit()
+        
+        flash('Review approved successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error approving review: {str(e)}")
+        flash('An error occurred.', 'danger')
+    
+    return redirect(url_for('admin_reviews'))
+
+@app.route('/admin/review/<int:review_id>/reject', methods=['POST'])
+def reject_review(review_id):
+    """Reject/delete a review"""
+    if not session.get('admin'):
+        return redirect(url_for('admin_login'))
+    
+    try:
+        review = Review.query.get_or_404(review_id)
+        professional_id = review.professional_id
+        
+        db.session.delete(review)
+        
+        professional = Professional.query.get(professional_id)
+        professional.update_rating()
+        
+        db.session.commit()
+        
+        flash('Review deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting review: {str(e)}")
+        flash('An error occurred.', 'danger')
+    
+    return redirect(url_for('admin_reviews'))
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -514,13 +1016,21 @@ def create_tables():
                 db.session.add(prof)
             
             db.session.commit()
-            print("Sample professionals added!")
+            print("✅ Sample professionals added!")
         
-        print("Database tables created successfully!")
+        print("✅ Database tables created successfully!")
 
 # ============================================
 # APPLICATION STARTUP
 # ============================================
 if __name__ == '__main__':
     create_tables()
+    print("\n" + "="*50)
+    print("🚀 Mental Health Platform Started!")
+    print("="*50)
+    print("📧 Email notifications:", "Enabled" if app.config['MAIL_USERNAME'] else "Disabled (configure .env)")
+    print("🔐 User authentication: Enabled")
+    print("⭐ Review system: Enabled")
+    print("👨‍⚕️ Professionals: Ready")
+    print("="*50 + "\n")
     app.run(host='0.0.0.0', debug=True, port=5000)

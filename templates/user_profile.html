@@ -1,0 +1,265 @@
+<!-- ========================================== -->
+<!-- USER PROFILE TEMPLATE (user_profile.html) -->
+<!-- ========================================== -->
+
+{% extends "layout.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<style>
+    .profile-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        padding: 3rem 2rem;
+    }
+
+    .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-avatar svg {
+        width: 60px;
+        height: 60px;
+        color: #3498db;
+    }
+
+    .profile-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-header p {
+        opacity: 0.95;
+        font-size: 1.1rem;
+    }
+
+    .profile-body {
+        padding: 3rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-card {
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 16px;
+        border-left: 4px solid #3498db;
+    }
+
+    .info-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .info-label svg {
+        width: 18px;
+        height: 18px;
+        color: #3498db;
+    }
+
+    .info-value {
+        font-size: 1.2rem;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .stats-section {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1976d2;
+    }
+
+    .stat-label {
+        color: #1565c0;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    }
+
+    .btn-outline {
+        background: white;
+        color: #3498db;
+        border: 2px solid #3498db;
+    }
+
+    .btn-outline:hover {
+        background: #e3f2fd;
+    }
+
+    @media (max-width: 768px) {
+        .info-grid, .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="profile-page">
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <h1>{{ user.name }}</h1>
+                <p>Member since {{ user.created_at.strftime('%B %Y') }}</p>
+            </div>
+
+            <div class="profile-body">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Email Address
+                        </div>
+                        <div class="info-value">{{ user.email }}</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            Phone Number
+                        </div>
+                        <div class="info-value">{{ user.phone }}</div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div>
+                            <div class="stat-number">{{ total_appointments }}</div>
+                            <div class="stat-label">Total Appointments</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">{{ completed_appointments }}</div>
+                            <div class="stat-label">Completed Sessions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                    <a href="{{ url_for('professionals') }}" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Book New Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

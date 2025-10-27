@@ -1,0 +1,313 @@
+<!-- LEAVE REVIEW TEMPLATE (leave_review.html) -->
+{% extends "layout.html" %}
+{% block title %}Leave Review{% endblock %}
+
+{% block content %}
+<style>
+    .review-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        padding: 3rem 2rem;
+    }
+
+    .review-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .review-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .review-header {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+
+    .review-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .review-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .review-body {
+        padding: 2.5rem;
+    }
+
+    .prof-info {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+    }
+
+    .prof-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .prof-avatar svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+    }
+
+    .prof-details h3 {
+        font-size: 1.3rem;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .prof-details p {
+        color: #b8860b;
+        font-weight: 600;
+    }
+
+    .rating-section {
+        margin-bottom: 2rem;
+    }
+
+    .rating-section label {
+        display: block;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .star-rating {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 3rem;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .star {
+        cursor: pointer;
+        color: #ddd;
+        transition: all 0.3s ease;
+    }
+
+    .star:hover,
+    .star.active {
+        color: #ffc107;
+        transform: scale(1.1);
+    }
+
+    .rating-text {
+        text-align: center;
+        color: #666;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .form-group textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        min-height: 150px;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #ffc107;
+        box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        accent-color: #ffc107;
+    }
+
+    .checkbox-group label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1.1rem;
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+    }
+
+    .btn-submit:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    input[type="hidden"] {
+        display: none;
+    }
+</style>
+
+<div class="review-page">
+    <div class="review-container">
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-icon">⭐</div>
+                <h1>Share Your Experience</h1>
+                <p>Your feedback helps others find the right professional</p>
+            </div>
+
+            <div class="review-body">
+                <div class="prof-info">
+                    <div class="prof-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="prof-details">
+                        <h3>{{ appointment.professional.name }}</h3>
+                        <p>{{ appointment.professional.title }}</p>
+                    </div>
+                </div>
+
+                <form method="POST" id="reviewForm">
+                    <div class="rating-section">
+                        <label>How would you rate your experience?</label>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <div class="rating-text" id="ratingText">Click a star to rate</div>
+                        <input type="hidden" name="rating" id="ratingInput" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment">Tell us about your experience (optional)</label>
+                        <textarea id="comment" name="comment" placeholder="Share your thoughts about the session, what you found helpful, and how the professional made you feel..."></textarea>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="is_anonymous" name="is_anonymous">
+                        <label for="is_anonymous">Post this review anonymously</label>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn" disabled>Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('ratingInput');
+    const ratingText = document.getElementById('ratingText');
+    const submitBtn = document.getElementById('submitBtn');
+    let selectedRating = 0;
+
+    const ratingTexts = {
+        1: '⭐ Poor',
+        2: '⭐⭐ Fair',
+        3: '⭐⭐⭐ Good',
+        4: '⭐⭐⭐⭐ Very Good',
+        5: '⭐⭐⭐⭐⭐ Excellent'
+    };
+
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            selectedRating = parseInt(this.dataset.rating);
+            ratingInput.value = selectedRating;
+            ratingText.textContent = ratingTexts[selectedRating];
+            submitBtn.disabled = false;
+
+            stars.forEach(s => {
+                s.classList.remove('active');
+                if (parseInt(s.dataset.rating) <= selectedRating) {
+                    s.classList.add('active');
+                }
+            });
+        });
+
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.rating);
+            stars.forEach(s => {
+                if (parseInt(s.dataset.rating) <= rating) {
+                    s.style.color = '#ffc107';
+                }
+            });
+        });
+
+        star.addEventListener('mouseleave', function() {
+            stars.forEach(s => {
+                if (parseInt(s.dataset.rating) <= selectedRating) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+    });
+
+    document.getElementById('reviewForm').addEventListener('submit', function(e) {
+        if (!selectedRating) {
+            e.preventDefault();
+            alert('Please select a rating before submitting.');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,276 @@
+<!-- ========================================== -->
+<!-- PROFESSIONAL REVIEWS TEMPLATE -->
+<!-- (professional_reviews.html) -->
+<!-- ========================================== -->
+
+{% extends "layout.html" %}
+{% block title %}Reviews - {{ professional.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .reviews-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        padding: 3rem 2rem;
+    }
+
+    .reviews-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .prof-header {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .prof-avatar-large {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .prof-avatar-large svg {
+        width: 60px;
+        height: 60px;
+        color: white;
+    }
+
+    .prof-info h1 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .prof-info p {
+        color: #b8860b;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .rating-summary {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .rating-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #ffc107;
+    }
+
+    .rating-details {
+        flex: 1;
+    }
+
+    .stars-large {
+        font-size: 1.5rem;
+        color: #ffc107;
+        margin-bottom: 0.25rem;
+    }
+
+    .rating-count {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .reviews-section {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title svg {
+        width: 28px;
+        height: 28px;
+        color: #ffc107;
+    }
+
+    .review-card {
+        padding: 1.75rem;
+        background: #f8f9fa;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .review-card:hover {
+        background: #f0f4f8;
+        transform: translateY(-2px);
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .reviewer-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .reviewer-avatar {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #e8dcc8, #d4a574);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .reviewer-avatar svg {
+        width: 25px;
+        height: 25px;
+        color: white;
+    }
+
+    .reviewer-details h4 {
+        font-size: 1.1rem;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .review-date {
+        color: #999;
+        font-size: 0.85rem;
+    }
+
+    .review-stars {
+        font-size: 1.2rem;
+        color: #ffc107;
+    }
+
+    .review-comment {
+        color: #555;
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    .empty-reviews {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+
+    .empty-reviews svg {
+        width: 80px;
+        height: 80px;
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .prof-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .rating-summary {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="reviews-page">
+    <div class="reviews-container">
+        <div class="prof-header">
+            <div class="prof-avatar-large">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <div class="prof-info">
+                <h1>{{ professional.name }}</h1>
+                <p>{{ professional.title }}</p>
+                <div class="rating-summary">
+                    <div class="rating-number">{{ professional.rating }}</div>
+                    <div class="rating-details">
+                        <div class="stars-large">
+                            {% for i in range(5) %}★{% endfor %}
+                        </div>
+                        <div class="rating-count">Based on {{ professional.total_reviews }} reviews</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reviews-section">
+            <h2 class="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                Patient Reviews
+            </h2>
+
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-avatar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="reviewer-details">
+                                <h4>
+                                    {% if review.is_anonymous %}
+                                        Anonymous Patient
+                                    {% else %}
+                                        {{ review.user.name if review.user else 'Verified Patient' }}
+                                    {% endif %}
+                                </h4>
+                                <div class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</div>
+                            </div>
+                        </div>
+                        <div class="review-stars">
+                            {% for i in range(review.rating) %}★{% endfor %}
+                        </div>
+                    </div>
+                    {% if review.comment %}
+                    <div class="review-comment">{{ review.comment }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-reviews">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <h3>No Reviews Yet</h3>
+                    <p>Be the first to review {{ professional.name }}!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
