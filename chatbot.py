@@ -1,13 +1,12 @@
 import google.generativeai as genai
 from config import GEMINI_API_KEY, SYSTEM_PROMPT, MAX_CONVERSATION_LENGTH
-import time
-from typing import List, Dict, Optional
+from crisis_handler import CrisisHandler
+from typing import List, Dict
 
 class MentalHealthChatbot:
     def __init__(self):
         genai.configure(api_key=GEMINI_API_KEY)
         
-        # Create model WITHOUT system_instruction
         self.model = genai.GenerativeModel(
             model_name="gemini-2.5-flash",
             generation_config={
@@ -17,7 +16,6 @@ class MentalHealthChatbot:
             }
         )
     
-        # Include system prompt in the chat history instead
         self.chat_session = self.model.start_chat(
             history=[
                 {
@@ -26,23 +24,29 @@ class MentalHealthChatbot:
                 },
                 {
                     "role": "model", 
-                    "parts": ["I understand. I'm here to provide compassionate, empathetic mental health support. I'll be supportive and understanding, and mention professional help only when appropriate for severe distress or crisis situations."]
+                    "parts": ["I understand. I'm here to provide compassionate, empathetic mental health support. I'll listen without judgment and validate your feelings."]
                 }
             ]
         )
         self.conversation_history = []
-        self.first_message = True  
+        self.first_message = True
+        self.crisis_handler = CrisisHandler()
         
     def get_response(self, user_message: str) -> str:
         try:
-            from safety import validate_user_input, detect_crisis_keywords, get_crisis_response
+            from safety import validate_user_input
             
             validation = validate_user_input(user_message)
             if not validation['is_valid']:
                 return validation['message']
             
-            if validation['is_crisis']:
-                return get_crisis_response()
+            # Enhanced crisis detection
+            crisis_level = self.crisis_handler.detect_crisis_level(user_message)
+            
+            if crisis_level == "immediate":
+                return self.crisis_handler.get_immediate_crisis_response()
+            elif crisis_level == "high":
+                return self.crisis_handler.get_high_risk_response(user_message)
             
             self.conversation_history.append({"role": "user", "content": user_message})
             
@@ -52,11 +56,14 @@ class MentalHealthChatbot:
             response = self.chat_session.send_message(user_message)
             bot_response = response.text
             
+            # Add empathetic context based on message sentiment
+            bot_response = self.crisis_handler.enhance_with_empathy(bot_response, user_message)
+            
             if self.first_message:
-                bot_response += "\n\n*I'm here to listen and support you. If you need more personalized help, check out our 1-to-1 professional support feature on the website.*"
+                bot_response += "\n\n*I'm here to listen and support you at your own pace. If you need more personalized help, our 1-to-1 professional support feature connects you with licensed mental health professionals.*"
                 self.first_message = False
-            elif self._contains_severe_distress(user_message):
-                bot_response += "\n\n*It sounds like you're going through a really difficult time. You might benefit from our 1-to-1 professional help feature where you can connect with licensed mental health professionals.*"
+            elif crisis_level == "moderate":
+                bot_response += "\n\n*What you're sharing sounds really challenging. I'm here to support you. If things feel overwhelming, our professional support team is available 24/7.*"
             
             self.conversation_history.append({"role": "assistant", "content": bot_response})
             
@@ -65,33 +72,34 @@ class MentalHealthChatbot:
         except Exception as e:
             return self._handle_error(e)
     
-    def _contains_severe_distress(self, message: str) -> bool:
-        severe_distress_keywords = [
-            'can\'t cope', 'can\'t handle', 'overwhelming', 'falling apart',
-            'breaking down', 'can\'t go on', 'losing control', 'spiraling',
-            'severe depression', 'panic attacks', 'mental breakdown',
-            'can\'t function', 'completely lost', 'desperate', 'trapped'
-        ]
-        message_lower = message.lower()
-        return any(keyword in message_lower for keyword in severe_distress_keywords)
-    
     def _handle_error(self, error) -> str:
         error_str = str(error).lower()
         
         if "quota" in error_str or "limit" in error_str:
-            return ("I'm experiencing high traffic right now. Please try again in a few moments. "
-                    "If you're in crisis, please contact a mental health professional or emergency services.")
+            return (
+                "I'm experiencing high traffic right now, but I want to make sure you're okay. "
+                "Please try again in a few moments. If you're in distress, please contact:\n"
+                "• **988**: Suicide & Crisis Lifeline (US)\n"
+                "• **Crisis Text Line**: Text HOME to 741741"
+            )
         
         elif "api_key" in error_str:
-            return ("I'm having technical difficulties. Please try again later. "
-                    "If this is an emergency, please contact emergency services.")
+            return (
+                "I'm having technical difficulties, and I apologize. "
+                "If you need immediate support, please reach out to:\n"
+                "• **988**: Suicide & Crisis Lifeline (US)\n"
+                "• **Crisis Text Line**: Text HOME to 741741"
+            )
         
         else:
-            return ("I apologize, I'm having technical difficulties. Please try again in a moment. "
-                    "If you need immediate support, please reach out to a mental health professional.")
+            return (
+                "I apologize, I'm having technical difficulties. Please try again in a moment. "
+                "If you need immediate support, please contact:\n"
+                "• **988**: Suicide & Crisis Lifeline (US)\n"
+                "• **Crisis Text Line**: Text HOME to 741741"
+            )
     
     def reset_conversation(self):
-        # Recreate chat with system prompt
         self.chat_session = self.model.start_chat(
             history=[
                 {
@@ -105,7 +113,12 @@ class MentalHealthChatbot:
             ]
         )
         self.conversation_history = []
-        self.first_message = True 
+        self.first_message = True
+        self.crisis_handler.reset()
     
     def get_conversation_history(self) -> List[Dict]:
         return self.conversation_history
+    
+    def get_crisis_alert_count(self) -> int:
+        """Return number of crisis incidents detected in current session"""
+        return self.crisis_handler.crisis_detected_count

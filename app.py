@@ -508,8 +508,15 @@ def leave_review(appt_id):
     return render_template('leave_review.html', appointment=appointment)
 
 # ============================================
-# CHATBOT ROUTES
+# CHATBOT ROUTES - STREAMLINED VERSION (AI ONLY)
 # ============================================
+from flask import render_template, request, jsonify, session
+from chatbot import MentalHealthChatbot
+import secrets
+
+# Store chatbot instances per session
+chatbots = {}
+
 @app.route('/ai-assessment')
 def ai_assessment():
     """Route for the AI chatbot page"""
@@ -525,60 +532,91 @@ def chat():
         if not user_message.strip():
             return jsonify({'error': 'Empty message'}), 400
         
+        # Get or create session ID
         session_id = session.get('chatbot_session_id')
         if not session_id:
             session_id = secrets.token_hex(8)
             session['chatbot_session_id'] = session_id
         
+        # Create chatbot instance if it doesn't exist
         if session_id not in chatbots:
-            # Create a simple chatbot if MentalHealthChatbot is not available
-            chatbots[session_id] = SimpleChatbot()
+            chatbots[session_id] = MentalHealthChatbot()
+            print(f"✓ Created new chatbot session: {session_id}")
         
+        # Get response from chatbot
         chatbot = chatbots[session_id]
         response = chatbot.get_response(user_message)
         
         return jsonify({'response': response})
     
     except Exception as e:
-        print(f"Error in chat endpoint: {str(e)}")
-        return jsonify({'error': 'An error occurred processing your message'}), 500
+        print(f"❌ Error in chat endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        # Return user-friendly error with crisis resources
+        return jsonify({
+            'error': 'I apologize, I\'m experiencing technical difficulties. Please try again in a moment.',
+            'crisis_resources': (
+                'If you need immediate support:\n'
+                '• 988: Suicide & Crisis Lifeline\n'
+                '• Crisis Text Line: Text HOME to 741741'
+            )
+        }), 500
 
 @app.route('/chat/reset', methods=['POST'])
 def reset_chat():
     """Reset chatbot conversation"""
     try:
         session_id = session.get('chatbot_session_id')
+        
         if session_id and session_id in chatbots:
             chatbots[session_id].reset_conversation()
             del chatbots[session_id]
-        return jsonify({'status': 'success'})
+            print(f"✓ Reset chatbot session: {session_id}")
+        
+        # Clear session ID so a new chatbot will be created
+        session.pop('chatbot_session_id', None)
+        
+        return jsonify({'status': 'success', 'message': 'Conversation reset successfully'})
+        
     except Exception as e:
-        print(f"Error in reset endpoint: {str(e)}")
+        print(f"❌ Error in reset endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': 'An error occurred resetting the conversation'}), 500
 
-# Simple chatbot implementation as fallback
-class SimpleChatbot:
-    def __init__(self):
-        self.conversation_history = []
-    
-    def get_response(self, message):
-        message_lower = message.lower()
+@app.route('/chat/history', methods=['GET'])
+def get_chat_history():
+    """Get conversation history for current session"""
+    try:
+        session_id = session.get('chatbot_session_id')
         
-        if any(word in message_lower for word in ['hello', 'hi', 'hey']):
-            return "Hello! I'm here to help with mental health support. How are you feeling today?"
-        elif any(word in message_lower for word in ['sad', 'depressed', 'unhappy']):
-            return "I'm sorry to hear you're feeling this way. It's important to talk about these feelings. Have you considered speaking with a mental health professional?"
-        elif any(word in message_lower for word in ['anxious', 'anxiety', 'worried']):
-            return "Anxiety can be challenging. Deep breathing exercises and mindfulness can help. Would you like me to help you find a professional to talk to?"
-        elif any(word in message_lower for word in ['stress', 'stressed']):
-            return "Stress affects many people. Remember to take breaks and practice self-care. Our professionals can teach you coping strategies."
-        elif any(word in message_lower for word in ['thank', 'thanks']):
-            return "You're welcome! Remember, seeking help is a sign of strength. Would you like to book an appointment with one of our professionals?"
-        else:
-            return "Thank you for sharing. I'm here to listen and help connect you with mental health resources. Would you like to learn more about our services or book an appointment?"
+        if session_id and session_id in chatbots:
+            history = chatbots[session_id].get_conversation_history()
+            return jsonify({'history': history})
+        
+        return jsonify({'history': []})
+        
+    except Exception as e:
+        print(f"❌ Error getting chat history: {str(e)}")
+        return jsonify({'error': 'Could not retrieve chat history'}), 500
 
-    def reset_conversation(self):
-        self.conversation_history = []
+@app.route('/chat/crisis-count', methods=['GET'])
+def get_crisis_count():
+    """Get number of crisis alerts detected in current session"""
+    try:
+        session_id = session.get('chatbot_session_id')
+        
+        if session_id and session_id in chatbots:
+            count = chatbots[session_id].get_crisis_alert_count()
+            return jsonify({'crisis_count': count})
+        
+        return jsonify({'crisis_count': 0})
+        
+    except Exception as e:
+        print(f"❌ Error getting crisis count: {str(e)}")
+        return jsonify({'error': 'Could not retrieve crisis count'}), 500
 
 # ============================================
 # APPOINTMENT ROUTES
