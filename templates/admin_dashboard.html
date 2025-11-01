@@ -34,13 +34,6 @@
         margin: 0;
     }
 
-    .header-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
     .btn {
         padding: 0.7rem 1.5rem;
         border: none;
@@ -49,35 +42,7 @@
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        white-space: nowrap;
-    }
-
-    .btn svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #d4a574, #c8956d);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(200, 149, 109, 0.4);
-    }
-
-    .btn-warning {
-        background: linear-gradient(135deg, #ffc107, #ff9800);
-        color: white;
-    }
-
-    .btn-warning:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        display: inline-block;
     }
 
     .btn-danger {
@@ -167,21 +132,11 @@
         background: linear-gradient(135deg, #d4a574, #c8956d);
         color: white;
         padding: 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
 
     .section-header h2 {
         font-size: 1.8rem;
         margin: 0;
-    }
-
-    .filter-badge {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
     }
 
     .table-container {
@@ -234,58 +189,11 @@
     .patient-info {
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 3px;
     }
 
     .contact-info {
         color: #666;
-        font-size: 0.85rem;
-        line-height: 1.6;
-    }
-
-    .professional-info {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .prof-avatar-mini {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #d4a574, #c8956d);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .prof-avatar-mini svg {
-        width: 20px;
-        height: 20px;
-        color: white;
-    }
-
-    .prof-details-mini {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .prof-name-mini {
-        font-weight: 600;
-        color: #2c3e50;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .prof-title-mini {
-        font-size: 0.75rem;
-        color: #666;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 0.95rem;
     }
 
     .service-type {
@@ -301,8 +209,6 @@
     .datetime-info {
         color: #333;
         font-weight: 500;
-        font-size: 0.9rem;
-        line-height: 1.6;
     }
 
     .status-badge {
@@ -320,7 +226,7 @@
         color: #856404;
     }
 
-    .status-approved, .status-confirmed {
+    .status-approved {
         background: #d4edda;
         color: #155724;
     }
@@ -421,15 +327,6 @@
             gap: 1rem;
         }
 
-        .header-actions {
-            width: 100%;
-        }
-
-        .btn {
-            flex: 1;
-            justify-content: center;
-        }
-
         .page-title h1 {
             font-size: 2rem;
         }
@@ -445,12 +342,6 @@
 
         .stat-number {
             font-size: 2rem;
-        }
-
-        .section-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
         }
 
         .appointments-table {
@@ -472,20 +363,11 @@
             width: 100%;
             text-align: center;
         }
-
-        .professional-info {
-            flex-direction: column;
-            align-items: flex-start;
-        }
     }
 
     @media (max-width: 480px) {
         .dashboard-stats {
             grid-template-columns: 1fr;
-        }
-
-        .header-actions {
-            flex-direction: column;
         }
     }
 </style>
@@ -496,31 +378,7 @@
             <div class="page-title">
                 <h1>Admin Dashboard</h1>
             </div>
-            <div class="header-actions">
-                <a href="{{ url_for('admin_professionals') }}" class="btn btn-primary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    Professionals
-                </a>
-                <a href="{{ url_for('admin_reviews') }}" class="btn btn-warning">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                    Reviews
-                </a>
-                <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                </a>
-            </div>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">Logout</a>
         </div>
 
         <!-- Dashboard Statistics -->
@@ -534,10 +392,7 @@
                 <div class="stat-label">Pending</div>
             </div>
             <div class="stat-card stat-approved">
-                <div class="stat-number">
-                    {{ (appointments|selectattr("status", "equalto", "Approved")|list|length) + 
-                       (appointments|selectattr("status", "equalto", "Confirmed")|list|length) }}
-                </div>
+                <div class="stat-number">{{ appointments|selectattr("status", "equalto", "Approved")|list|length }}</div>
                 <div class="stat-label">Approved</div>
             </div>
             <div class="stat-card stat-cancelled">
@@ -550,9 +405,6 @@
         <div class="appointments-section">
             <div class="section-header">
                 <h2>All Appointments</h2>
-                {% if appointments %}
-                <div class="filter-badge">{{ appointments|length }} Total</div>
-                {% endif %}
             </div>
 
             {% if not appointments %}
@@ -560,7 +412,7 @@
                     <div class="empty-state-icon">📋</div>
                     <h3>No appointments yet</h3>
                     <p>Appointment requests will appear here when users book sessions</p>
-                    <a href="{{ url_for('index') }}" class="btn btn-primary">Go to Home Page</a>
+                    <a href="{{ url_for('index') }}" class="btn">Go to Home Page</a>
                 </div>
             {% else %}
                 <div class="table-container">
@@ -568,9 +420,9 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Patient</th>
-                                <th>Professional</th>
-                                <th>Service</th>
+                                <th>Patient Name</th>
+                                <th>Contact Details</th>
+                                <th>Service Type</th>
                                 <th>Date & Time</th>
                                 <th>Status</th>
                                 <th>Booked On</th>
@@ -585,23 +437,11 @@
                                     </td>
                                     <td>
                                         <div class="patient-info">{{ a.user_name }}</div>
-                                        <div class="contact-info">
-                                            {{ a.user_email }}<br>
-                                            {{ a.user_phone }}
-                                        </div>
                                     </td>
                                     <td>
-                                        <div class="professional-info">
-                                            <div class="prof-avatar-mini">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                                    <circle cx="12" cy="7" r="4"></circle>
-                                                </svg>
-                                            </div>
-                                            <div class="prof-details-mini">
-                                                <div class="prof-name-mini">{{ a.professional.name }}</div>
-                                                <div class="prof-title-mini">{{ a.professional.title }}</div>
-                                            </div>
+                                        <div class="contact-info">
+                                            📧 {{ a.user_email }}<br>
+                                            📱 {{ a.user_phone }}
                                         </div>
                                     </td>
                                     <td>
@@ -609,7 +449,7 @@
                                     </td>
                                     <td>
                                         <div class="datetime-info">
-                                            📅 {{ a.date.strftime('%b %d, %Y') }}<br>
+                                            📅 {{ a.date.strftime('%Y-%m-%d') }}<br>
                                             🕐 {{ a.time.strftime('%I:%M %p') }}
                                         </div>
                                     </td>
@@ -620,14 +460,14 @@
                                     </td>
                                     <td>
                                         <div class="datetime-info">
-                                            {{ a.created_at.strftime('%b %d, %Y') }}
+                                            {{ a.created_at.strftime('%Y-%m-%d') }}
                                         </div>
                                     </td>
                                     <td>
                                         <div class="action-group">
                                             <form method="post" action="{{ url_for('update_status', appt_id=a.id) }}" style="display:inline;">
                                                 <select name="status" onchange="this.form.submit()" class="status-select">
-                                                    {% for s in ['Pending','Approved','Confirmed','Cancelled','Completed'] %}
+                                                    {% for s in ['Pending','Approved','Cancelled','Completed'] %}
                                                         <option value="{{ s }}" {% if s==a.status %}selected{% endif %}>{{ s }}</option>
                                                     {% endfor %}
                                                 </select>
