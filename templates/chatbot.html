@@ -101,6 +101,27 @@
         z-index: 1;
     }
 
+    .clear-chat-btn {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .clear-chat-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.05);
+    }
+
     .chat-messages {
         flex: 1;
         overflow-y: auto;
@@ -379,6 +400,14 @@
             font-size: 1.25rem;
         }
 
+        .clear-chat-btn {
+            position: static;
+            transform: none;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+        }
+
         .chat-messages {
             padding: 1rem;
         }
@@ -419,6 +448,7 @@
             <div class="chat-header">
                 <h2>Mental Health Assistant</h2>
                 <p>Available 24/7 for mental health support</p>
+                <button class="clear-chat-btn" id="clearChatBtn">Clear Chat</button>
             </div>
 
             <div class="chat-messages" id="chatMessages">
@@ -429,12 +459,6 @@
                         <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
                     <span><strong>Privacy Note:</strong> This is a supportive AI assistant. For emergencies, please contact your local crisis hotline.</span>
-                </div>
-                <div class="message ai">
-                    <div class="message-avatar">AI</div>
-                    <div class="message-content">
-                        🤖 Hello! I'm here to provide mental health support and guidance. How are you feeling today?
-                    </div>
                 </div>
             </div>
 
@@ -460,6 +484,9 @@
     const sendBtn = document.getElementById("sendBtn");
     const chatMessages = document.getElementById("chatMessages");
     const charCounter = document.getElementById("charCounter");
+    const clearChatBtn = document.getElementById("clearChatBtn");
+
+    const STORAGE_KEY = "mental_health_chat_history";
 
     // Character counter
     messageInput.addEventListener('input', function() {
@@ -474,7 +501,58 @@
         }
     });
 
-    function addMessage(content, isUser = false) {
+    // Save chat history to localStorage
+    function saveChatHistory(history) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        } catch (e) {
+            console.error("Error saving chat history:", e);
+        }
+    }
+
+    // Load chat history from localStorage
+    function loadChatHistory() {
+        try {
+            const history = localStorage.getItem(STORAGE_KEY);
+            return history ? JSON.parse(history) : [];
+        } catch (e) {
+            console.error("Error loading chat history:", e);
+            return [];
+        }
+    }
+
+    // Clear chat history
+    function clearChatHistory() {
+        if (confirm("Are you sure you want to clear the chat history? This cannot be undone.")) {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+                
+                // Reset chat on server
+                fetch("/chat/reset", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                // Clear UI
+                chatMessages.innerHTML = `
+                    <div class="info-banner">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span><strong>Privacy Note:</strong> This is a supportive AI assistant. For emergencies, please contact your local crisis hotline.</span>
+                    </div>
+                `;
+                
+                addInitialMessage();
+            } catch (e) {
+                console.error("Error clearing chat:", e);
+            }
+        }
+    }
+
+    function addMessage(content, isUser = false, skipSave = false) {
         const messageDiv = document.createElement("div");
         messageDiv.className = `message ${isUser ? "user" : "ai"}`;
         messageDiv.innerHTML = `
@@ -485,6 +563,21 @@
         `;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Save to localStorage
+        if (!skipSave) {
+            const history = loadChatHistory();
+            history.push({
+                role: isUser ? "user" : "assistant",
+                content: content,
+                timestamp: new Date().toISOString()
+            });
+            saveChatHistory(history);
+        }
+    }
+
+    function addInitialMessage() {
+        addMessage("Hello! I'm here to provide mental health support and guidance. How are you feeling today?", false, true);
     }
 
     function showTypingIndicator() {
@@ -509,6 +602,28 @@
     function removeTypingIndicator() {
         const typingIndicator = document.getElementById("typingIndicator");
         if (typingIndicator) typingIndicator.remove();
+    }
+
+    // Restore chat history on page load
+    function restoreChatHistory() {
+        const history = loadChatHistory();
+        
+        if (history.length === 0) {
+            addInitialMessage();
+        } else {
+            // Load history into server
+            fetch("/chat/load", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ history })
+            }).catch(console.error);
+
+            // Display messages
+            history.forEach(msg => {
+                const isUser = msg.role === "user";
+                addMessage(msg.content, isUser, true);
+            });
+        }
     }
 
     async function sendMessage() {
@@ -548,6 +663,7 @@
         }
     }
 
+    // Event listeners
     sendBtn.addEventListener("click", sendMessage);
     messageInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -555,7 +671,10 @@
             sendMessage();
         }
     });
+    clearChatBtn.addEventListener("click", clearChatHistory);
 
+    // Initialize
+    restoreChatHistory();
     messageInput.focus();
 </script>
 {% endblock %}

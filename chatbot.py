@@ -2,6 +2,8 @@ import google.generativeai as genai
 from config import GEMINI_API_KEY, SYSTEM_PROMPT, MAX_CONVERSATION_LENGTH
 from crisis_handler import CrisisHandler
 from typing import List, Dict
+from datetime import datetime
+import json
 
 class MentalHealthChatbot:
     def __init__(self):
@@ -48,7 +50,11 @@ class MentalHealthChatbot:
             elif crisis_level == "high":
                 return self.crisis_handler.get_high_risk_response(user_message)
             
-            self.conversation_history.append({"role": "user", "content": user_message})
+            self.conversation_history.append({
+                "role": "user", 
+                "content": user_message,
+                "timestamp": datetime.now().isoformat()
+            })
             
             if len(self.conversation_history) > MAX_CONVERSATION_LENGTH:
                 self.conversation_history = self.conversation_history[-MAX_CONVERSATION_LENGTH:]
@@ -65,7 +71,11 @@ class MentalHealthChatbot:
             elif crisis_level == "moderate":
                 bot_response += "\n\n*What you're sharing sounds really challenging. I'm here to support you. If things feel overwhelming, our professional support team is available 24/7.*"
             
-            self.conversation_history.append({"role": "assistant", "content": bot_response})
+            self.conversation_history.append({
+                "role": "assistant", 
+                "content": bot_response,
+                "timestamp": datetime.now().isoformat()
+            })
             
             return bot_response
             
@@ -98,6 +108,40 @@ class MentalHealthChatbot:
                 "• **988**: Suicide & Crisis Lifeline (US)\n"
                 "• **Crisis Text Line**: Text HOME to 741741"
             )
+    
+    def load_conversation_history(self, history: List[Dict]):
+        """Load conversation history from storage"""
+        self.conversation_history = history
+        if len(history) > 0:
+            self.first_message = False
+            
+            # Rebuild chat session with history
+            chat_history = [
+                {
+                    "role": "user", 
+                    "parts": [SYSTEM_PROMPT]
+                },
+                {
+                    "role": "model", 
+                    "parts": ["I understand. I'm here to provide compassionate mental health support."]
+                }
+            ]
+            
+            # Add previous messages to chat history
+            for msg in history:
+                if msg["role"] == "user":
+                    chat_history.append({
+                        "role": "user",
+                        "parts": [msg["content"]]
+                    })
+                elif msg["role"] == "assistant":
+                    chat_history.append({
+                        "role": "model",
+                        "parts": [msg["content"]]
+                    })
+            
+            # Recreate chat session with full history
+            self.chat_session = self.model.start_chat(history=chat_history)
     
     def reset_conversation(self):
         self.chat_session = self.model.start_chat(

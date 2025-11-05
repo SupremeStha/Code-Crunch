@@ -508,7 +508,7 @@ def leave_review(appt_id):
     return render_template('leave_review.html', appointment=appointment)
 
 # ============================================
-# CHATBOT ROUTES - STREAMLINED VERSION (AI ONLY)
+# CHATBOT ROUTES
 # ============================================
 from flask import render_template, request, jsonify, session
 from chatbot import MentalHealthChatbot
@@ -547,7 +547,11 @@ def chat():
         chatbot = chatbots[session_id]
         response = chatbot.get_response(user_message)
         
-        return jsonify({'response': response})
+        # Return response with conversation history for client-side storage
+        return jsonify({
+            'response': response,
+            'conversation_history': chatbot.get_conversation_history()
+        })
     
     except Exception as e:
         print(f"❌ Error in chat endpoint: {str(e)}")
@@ -563,6 +567,45 @@ def chat():
                 '• Crisis Text Line: Text HOME to 741741'
             )
         }), 500
+
+@app.route('/chat/load', methods=['POST'])
+def load_chat_history():
+    """Load conversation history from client (localStorage) into server session"""
+    try:
+        data = request.get_json()
+        history = data.get('history', [])
+        
+        if not history:
+            return jsonify({'status': 'success', 'message': 'No history to load'})
+        
+        # Get or create session ID
+        session_id = session.get('chatbot_session_id')
+        if not session_id:
+            session_id = secrets.token_hex(8)
+            session['chatbot_session_id'] = session_id
+        
+        # Create chatbot instance if it doesn't exist
+        if session_id not in chatbots:
+            chatbots[session_id] = MentalHealthChatbot()
+            print(f"✓ Created new chatbot session: {session_id}")
+        
+        # Load the history into the chatbot
+        chatbot = chatbots[session_id]
+        chatbot.load_conversation_history(history)
+        
+        print(f"✓ Loaded {len(history)} messages into session: {session_id}")
+        
+        return jsonify({
+            'status': 'success',
+            'message': f'Loaded {len(history)} messages',
+            'session_id': session_id
+        })
+        
+    except Exception as e:
+        print(f"❌ Error loading chat history: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'Could not load chat history'}), 500
 
 @app.route('/chat/reset', methods=['POST'])
 def reset_chat():
@@ -617,7 +660,7 @@ def get_crisis_count():
     except Exception as e:
         print(f"❌ Error getting crisis count: {str(e)}")
         return jsonify({'error': 'Could not retrieve crisis count'}), 500
-
+    
 # ============================================
 # APPOINTMENT ROUTES
 # ============================================
