@@ -83,32 +83,103 @@ class CrisisHandler:
         return "none"
     
     def get_immediate_crisis_response(self) -> str:
-        """Response for immediate crisis situations"""
-        return (
-            "🚨 I'm genuinely concerned about what you've shared. Your safety is the priority.\n\n"
-            "Please reach out for immediate support:\n"
-            "• **National Suicide Prevention Lifeline**: 988 (call/text, US)\n"
-            "• **Crisis Text Line**: Text HOME to 741741\n"
-            "• **International Association for Suicide Prevention**: https://www.iasp.info/resources/Crisis_Centres/\n"
-            "• **Emergency Services**: 911 (US) or your local emergency number\n\n"
-            "You deserve support through this. Please contact one of these resources right now—they have people trained to help, "
-            "and you won't be judged. If you're unable to reach these services, please go to your nearest emergency room.\n\n"
-            "*I'm here, and I care about your wellbeing.*"
-        )
+        """Response for immediate crisis situations with HTML formatting"""
+        return """
+<div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); padding: 25px; border-radius: 15px; color: white; box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3); margin: 10px 0;">
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <span style="font-size: 32px; margin-right: 15px;">🆘</span>
+        <h3 style="margin: 0; font-size: 22px; font-weight: 700;">I'm genuinely concerned about you</h3>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+        Your safety is the absolute priority right now. Please reach out for immediate support—trained professionals are available and they truly care.
+    </p>
+    
+    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">📞 Immediate Crisis Support in Nepal:</h4>
+        
+        <div style="margin-bottom: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 17px; margin-bottom: 5px;">🇳🇵 Nepal Mental Health Helpline</div>
+            <div style="font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #f1c40f;">1660 01 32547</div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Mental health support and counseling</div>
+        </div>
+        
+        <div style="margin-bottom: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 17px; margin-bottom: 5px;">🏥 Transcultural Psychosocial Organization (TPO)</div>
+            <div style="font-size: 20px; font-weight: 700;"><span style="color: #f1c40f;">01-4102803</span> / <span style="color: #f1c40f;">01-4102881</span></div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Free mental health counseling services</div>
+        </div>
+        
+        <div style="margin-bottom: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 17px; margin-bottom: 5px;">💚 Patan Hospital Mental Health Unit</div>
+            <div style="font-size: 20px; font-weight: 700; color: #f1c40f;">01-5522278</div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">24/7 psychiatric emergency services</div>
+        </div>
+        
+        <div style="margin-bottom: 15px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 17px; margin-bottom: 5px;">🩺 Nepal Psychosocial Counseling Center</div>
+            <div style="font-size: 20px; font-weight: 700; color: #f1c40f;">9851161665</div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Confidential counseling support</div>
+        </div>
+        
+        <div style="padding: 12px; background: rgba(241, 196, 15, 0.2); border-radius: 8px; border-left: 4px solid #f1c40f;">
+            <div style="font-weight: 600; font-size: 17px; margin-bottom: 5px;">🚨 Emergency Services</div>
+            <div style="font-size: 20px; font-weight: 700;">Call <span style="color: #f1c40f;">100</span> or <span style="color: #f1c40f;">102</span> (Nepal Police/Ambulance)</div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Or visit nearest hospital emergency: Bir Hospital, Teaching Hospital, Patan Hospital</div>
+        </div>
+    </div>
+    
+    <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 15px; text-align: center;">
+        <p style="margin: 0; font-size: 16px; font-weight: 500; line-height: 1.5;">
+            💙 You deserve support through this. These services won't judge you—they're here to help. 
+            Please reach out right now. Your life matters.
+        </p>
+    </div>
+</div>
+"""
     
     def get_high_risk_response(self, user_message: str) -> str:
-        """Response for high-risk situations"""
-        return (
-            "I hear you, and I want you to know that what you're feeling is real and valid. "
-            "The intensity of what you're experiencing right now is significant, and you shouldn't have to navigate this alone.\n\n"
-            "**Please consider reaching out for professional support:**\n"
-            "• **National Suicide Prevention Lifeline**: 988 (call/text, US)\n"
-            "• **Crisis Text Line**: Text HOME to 741741\n"
-            "• **Our 1-to-1 Professional Support**: Connect with a licensed mental health professional who can provide personalized care\n\n"
-            "In the meantime, I'm here to listen. Can you tell me a bit more about what's happening right now? "
-            "Sometimes talking through it can help, even in small steps.\n\n"
-            "*You matter, and things can get better.*"
-        )
+        """Response for high-risk situations with HTML formatting"""
+        return """
+<div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 25px; border-radius: 15px; color: white; box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3); margin: 10px 0;">
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <span style="font-size: 32px; margin-right: 15px;">💗</span>
+        <h3 style="margin: 0; font-size: 22px; font-weight: 700;">I hear you, and you're not alone</h3>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+        What you're feeling is real and valid. The intensity of what you're experiencing is significant, and you shouldn't have to navigate this alone.
+    </p>
+    
+    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+        <h4 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">🤝 Professional Support Available:</h4>
+        
+        <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 16px;">📞 Crisis Lifeline: <span style="color: #ffd700; font-size: 20px;">988</span></div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Call or text anytime (US)</div>
+        </div>
+        
+        <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 16px;">💬 Text Support: <span style="color: #ffd700;">HOME to 741741</span></div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Free crisis counseling via text</div>
+        </div>
+        
+        <div style="padding: 12px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; border-left: 4px solid #ffd700;">
+            <div style="font-weight: 600; font-size: 16px;">👨‍⚕️ Our 1-to-1 Professional Support</div>
+            <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Connect with licensed mental health professionals for personalized care</div>
+        </div>
+    </div>
+    
+    <div style="background: rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 15px;">
+        <p style="margin: 0 0 10px 0; font-size: 15px; line-height: 1.5;">
+            In the meantime, I'm here to listen. Can you tell me more about what's happening right now? Sometimes talking through it can help, even in small steps.
+        </p>
+        <p style="margin: 0; font-size: 16px; font-weight: 600; text-align: center;">
+            ✨ You matter, and things can get better.
+        </p>
+    </div>
+</div>
+"""
     
     def enhance_with_empathy(self, response: str, user_message: str) -> str:
         """Add personalized empathetic touches based on user's emotional context"""
