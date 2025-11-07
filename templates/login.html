@@ -1,11 +1,11 @@
-<!-- LOGIN TEMPLATE (login.html) -->
 {% extends "layout.html" %}
 {% block title %}Login{% endblock %}
 
 {% block content %}
 <style>
+    /* New Minimalist/Bordered Aesthetic */
     .auth-page {
-        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        background: #f0ebe5; /* Light Beige Background */
         min-height: calc(100vh - 56px);
         display: flex;
         align-items: center;
@@ -14,138 +14,152 @@
     }
 
     .auth-container {
-        max-width: 450px;
+        max-width: 400px;
         width: 100%;
     }
 
     .auth-card {
         background: white;
-        border-radius: 24px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(212, 165, 116, 0.3); /* Subtle theme-based border */
         overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .auth-card:hover {
+        transform: translateY(-3px);
     }
 
     .auth-header {
-        background: linear-gradient(135deg, #d4a574, #c8956d);
-        color: white;
-        padding: 2.5rem 2rem;
         text-align: center;
-    }
-
-    .auth-icon {
-        width: 80px;
-        height: 80px;
-        background: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-    }
-
-    .auth-icon svg {
-        width: 40px;
-        height: 40px;
-        color: #c8956d;
+        padding: 2.5rem 2rem 1rem;
+        color: #2c3e50; /* Dark text for a clean contrast */
     }
 
     .auth-header h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
         margin-bottom: 0.5rem;
+        font-weight: 700;
+        color: #c8956d; /* Use the main theme color for the title */
     }
 
     .auth-header p {
-        opacity: 0.95;
+        font-size: 1rem;
+        color: #777;
+    }
+
+    .auth-icon {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 0.5rem;
+        color: #d4a574; /* Theme accent color for the icon */
+    }
+
+    .auth-icon svg {
+        width: 100%;
+        height: 100%;
+        stroke-width: 1.5;
     }
 
     .auth-body {
-        padding: 2.5rem;
+        padding: 2rem 2.5rem;
     }
 
     .form-group {
         margin-bottom: 1.5rem;
     }
 
+    .form-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
     .form-group label {
         display: block;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        color: #d4a574;
+        pointer-events: none;
+        width: 20px;
+        height: 20px;
+        opacity: 0.7;
     }
 
     .form-group input {
         width: 100%;
-        padding: 1rem;
-        border: 2px solid #e0e0e0;
+        padding: 1rem 1rem 1rem 3rem; /* Padding for the icon */
+        border: 2px solid #e9e9e9;
         border-radius: 12px;
         font-size: 1rem;
         transition: all 0.3s ease;
+        background: #fafafa;
     }
 
     .form-group input:focus {
         outline: none;
         border-color: #c8956d;
-        box-shadow: 0 0 0 4px rgba(200, 149, 109, 0.1);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(200, 149, 109, 0.1);
     }
 
     .btn-auth {
         width: 100%;
         padding: 1rem;
-        background: linear-gradient(135deg, #d4a574, #c8956d);
+        background: linear-gradient(145deg, #d4a574, #c8956d); /* Keep original gradient */
         color: white;
         border: none;
         border-radius: 12px;
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 1.05rem;
+        font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-top: 1rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 15px rgba(200, 149, 109, 0.3);
     }
 
     .btn-auth:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(200, 149, 109, 0.5);
     }
 
     .auth-footer {
         text-align: center;
-        margin-top: 1.5rem;
+        margin-top: 2rem;
         color: #666;
+        font-size: 0.95rem;
     }
 
     .auth-footer a {
         color: #c8956d;
         text-decoration: none;
         font-weight: 600;
+        transition: color 0.2s;
     }
 
     .auth-footer a:hover {
-        text-decoration: underline;
+        color: #a07a5e;
     }
 
+    /* Alert Styling (Kept Consistent) */
     .alert {
         padding: 1rem;
-        border-radius: 12px;
+        border-radius: 8px;
         margin-bottom: 1.5rem;
+        font-size: 0.95rem;
     }
 
-    .alert-danger {
-        background: #f8d7da;
-        color: #721c24;
-        border: 2px solid #f5c6cb;
-    }
-
-    .alert-warning {
-        background: #fff3cd;
-        color: #856404;
-        border: 2px solid #ffeaa7;
-    }
-
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-        border: 2px solid #c3e6cb;
-    }
+    .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 </style>
 
 <div class="auth-page">
@@ -153,13 +167,14 @@
         <div class="auth-card">
             <div class="auth-header">
                 <div class="auth-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <!-- Updated SVG for a simpler, cleaner icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </div>
-                <h1>Welcome Back</h1>
-                <p>Login to manage your appointments</p>
+                <h1>Account Login</h1>
+                <p>Access your appointment dashboard securely</p>
             </div>
 
             <div class="auth-body">
@@ -174,19 +189,34 @@
                 <form method="POST">
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                        <div class="form-input-wrapper">
+                            <!-- Email Icon -->
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                                <line x1="22" y1="4" x2="12" y2="14"></line>
+                                <line x1="2" y1="4" x2="12" y2="14"></line>
+                            </svg>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        <div class="form-input-wrapper">
+                            <!-- Password Icon (Lock) -->
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn-auth">Login</button>
+                    <button type="submit" class="btn-auth">Sign In</button>
                 </form>
 
                 <div class="auth-footer">
-                    Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+                    New here? <a href="{{ url_for('register') }}">Create an account</a>
                 </div>
             </div>
         </div>

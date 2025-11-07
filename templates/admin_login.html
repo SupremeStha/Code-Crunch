@@ -2,223 +2,322 @@
 {% block title %}Admin Login{% endblock %} 
 {% block content %}
 <div class="login-container">
-    <div class="login-card">
-        <div class="login-header">
-            <h1 class="login-title">Admin Login</h1>
-            <p class="login-subtitle">Please login to access the admin dashboard</p>
+    <div class="login-wrapper">
+        <div class="login-visual">
+            <div class="visual-content">
+                <div class="lock-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h2>Secure Access</h2>
+                <p>Administrator Portal</p>
+            </div>
         </div>
 
-        <form method="POST" action="{{ url_for('admin_login') }}" class="login-form">
-            <div class="form-group">
-                <label for="username" class="form-label">Username</label>
-                <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    class="form-input" 
-                    placeholder="Enter your username" 
-                    required 
-                    autocomplete="username"
-                />
-                <i class="form-icon">👤</i>
+        <div class="login-form-section">
+            <div class="form-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to your admin account</p>
             </div>
 
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    class="form-input" 
-                    placeholder="Enter your password" 
-                    required 
-                    autocomplete="current-password"
-                />
-                <i class="form-icon">🔒</i>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Login</button>
-                <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
-            </div>
-        </form>
-
-        <div class="demo-credentials">
-            <h3>Demo Credentials</h3>
-            <div class="credentials">
-                <div class="credential-item">
-                    <span class="credential-label">Username:</span>
-                    <span class="credential-value">admin</span>
+            <form method="POST" action="{{ url_for('admin_login') }}" class="login-form">
+                <div class="input-group">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="input-content">
+                        <label for="username">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="Enter username" 
+                            required 
+                            autocomplete="username"
+                        />
+                    </div>
                 </div>
-                <div class="credential-item">
-                    <span class="credential-label">Password:</span>
-                    <span class="credential-value">password123</span>
+
+                <div class="input-group">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <div class="input-content">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Enter password" 
+                            required 
+                            autocomplete="current-password"
+                        />
+                    </div>
                 </div>
-            </div>
+
+                <button type="submit" class="btn-login">
+                    Sign In
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+
+                <a href="{{ url_for('index') }}" class="btn-back">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Return to Home
+                </a>
+            </form>
         </div>
     </div>
 </div>
 
 <style>
     .login-container {
+        background: linear-gradient(135deg, #faf7f2 0%, #f5ede3 100%);
+        min-height: calc(100vh - 56px);
         display: flex;
-        justify-content: center;
         align-items: center;
-        min-height: 80vh;
-        padding: 2rem 1rem;
+        justify-content: center;
+        padding: 1.5rem;
     }
 
-    .login-card {
+    .login-wrapper {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        max-width: 900px;
         width: 100%;
-        max-width: 420px;
-        position: relative;
     }
 
-    .login-header {
+    .login-visual {
+        background: linear-gradient(135deg, #c8956d 0%, #b8866d 100%);
+        padding: 2.5rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-visual::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .visual-content {
         text-align: center;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .lock-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .lock-icon svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+    }
+
+    .visual-content h2 {
+        font-size: 1.75rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 700;
+    }
+
+    .visual-content p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .login-form-section {
+        padding: 2.5rem 2rem;
+    }
+
+    .form-header {
         margin-bottom: 2rem;
     }
 
-    .login-title {
+    .form-header h1 {
         color: #2c3e50;
+        font-size: 1.75rem;
+        font-weight: 700;
         margin: 0 0 0.5rem 0;
-        font-size: 1.8rem;
-        font-weight: 600;
     }
 
-    .login-subtitle {
+    .form-header p {
         color: #7f8c8d;
         margin: 0;
         font-size: 0.95rem;
     }
 
     .login-form {
-        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
     }
 
-    .form-group {
-        position: relative;
-        margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #2c3e50;
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-    }
-
-    .form-icon {
-        position: absolute;
-        left: 0.75rem;
-        top: 2.4rem;
-        font-size: 1rem;
-    }
-
-    .form-actions {
+    .input-group {
         display: flex;
         gap: 1rem;
-        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
     }
 
-    .btn {
-        padding: 0.75rem 1.5rem;
+    .input-group:focus-within {
+        background: white;
+        border-color: #c8956d;
+        box-shadow: 0 0 0 3px rgba(200, 149, 109, 0.1);
+    }
+
+    .input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: #c8956d;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+    .input-icon svg {
+        width: 20px;
+        height: 20px;
+        color: white;
+    }
+
+    .input-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-content label {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .input-content input {
         border: none;
-        border-radius: 6px;
+        background: transparent;
+        padding: 0;
         font-size: 1rem;
+        color: #2c3e50;
+        outline: none;
+    }
+
+    .input-content input::placeholder {
+        color: #95a5a6;
+    }
+
+    .btn-login {
+        background: linear-gradient(135deg, #c8956d 0%, #b8866d 100%);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .btn-login svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+    }
+
+    .btn-back {
+        background: transparent;
+        color: #7f8c8d;
+        border: 2px solid #e0e0e0;
+        padding: 0.875rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        flex: 1;
-    }
-
-    .btn-primary {
-        background-color: #3498db;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-secondary {
-        background-color: #95a5a6;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: #7f8c8d;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .demo-credentials {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 1.5rem;
-        border-top: 1px solid #eee;
-    }
-
-    .demo-credentials h3 {
-        margin: 0 0 1rem 0;
-        font-size: 1rem;
-        color: #2c3e50;
-    }
-
-    .credentials {
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         gap: 0.5rem;
+        text-decoration: none;
     }
 
-    .credential-item {
-        display: flex;
-        justify-content: space-between;
+    .btn-back svg {
+        width: 18px;
+        height: 18px;
     }
 
-    .credential-label {
-        color: #7f8c8d;
-        font-weight: 500;
+    .btn-back:hover {
+        border-color: #c8956d;
+        color: #c8956d;
+        background: #f8f9fa;
     }
 
-    .credential-value {
-        color: #2c3e50;
-        font-weight: 600;
-    }
+    @media (max-width: 768px) {
+        .login-wrapper {
+            grid-template-columns: 1fr;
+        }
 
-    @media (max-width: 480px) {
-        .login-card {
+        .login-visual {
             padding: 2rem 1.5rem;
         }
-        
-        .form-actions {
-            flex-direction: column;
+
+        .login-form-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-header h1 {
+            font-size: 1.5rem;
         }
     }
 </style>

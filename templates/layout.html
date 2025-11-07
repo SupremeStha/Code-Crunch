@@ -510,13 +510,13 @@
                         >Professionals</a
                     >
                 </li>
-                <li>
+                <!-- <li>
                     <a
                         href="{{ url_for('check_status') }}"
                         class="{{ 'active' if request.endpoint == 'check_status' else '' }}"
                         >Check Status</a
                     >
-                </li>
+                </li> -->
                 
                 <!-- User-specific links (only show when logged in) -->
                 {% if session.user_id %}
@@ -572,7 +572,7 @@
                         <li><a href="{{ url_for('index') }}">Home</a></li>
                         <li><a href="{{ url_for('professionals') }}">Find Professionals</a></li>
                         <li><a href="{{ url_for('ai_assessment') }}">AI Assessment</a></li>
-                        <li><a href="{{ url_for('check_status') }}">Check Status</a></li>
+                        <!-- <li><a href="{{ url_for('check_status') }}">Check Status</a></li> -->
                         {% if session.user_id %}
                         <li><a href="{{ url_for('user_dashboard') }}">My Dashboard</a></li>
                         {% else %}
