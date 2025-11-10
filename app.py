@@ -508,11 +508,16 @@ def leave_review(appt_id):
     return render_template('leave_review.html', appointment=appointment)
 
 # ============================================
-# CHATBOT ROUTES
+# CHATBOT BOOKING ROUTES (ADD THESE TO YOUR APP.PY)
 # ============================================
+
 from flask import render_template, request, jsonify, session
 from chatbot import MentalHealthChatbot
+from datetime import datetime
 import secrets
+
+# Import db, Professional, and Appointment from your existing models
+# These should already be imported at the top of your app.py
 
 # Store chatbot instances per session
 chatbots = {}
@@ -547,10 +552,19 @@ def chat():
         chatbot = chatbots[session_id]
         response = chatbot.get_response(user_message)
         
+        # Check if booking is complete
+        booking_complete = False
+        conversation_history = chatbot.get_conversation_history()
+        if conversation_history and len(conversation_history) > 0:
+            last_msg = conversation_history[-1]
+            if last_msg.get('booking_complete'):
+                booking_complete = True
+        
         # Return response with conversation history for client-side storage
         return jsonify({
             'response': response,
-            'conversation_history': chatbot.get_conversation_history()
+            'conversation_history': conversation_history,
+            'booking_complete': booking_complete
         })
     
     except Exception as e:
@@ -567,6 +581,158 @@ def chat():
                 '• Crisis Text Line: Text HOME to 741741'
             )
         }), 500
+
+@app.route('/api/professionals', methods=['GET'])
+def api_professionals():
+    """API endpoint to get all active professionals for chatbot booking"""
+    try:
+        # Query active professionals
+        professionals = Professional.query.filter_by(is_active=True).order_by(Professional.name).all()
+        
+        print(f"📊 Found {len(professionals)} active professionals")
+        
+        # Build response list
+        prof_list = []
+        for prof in professionals:
+            prof_data = {
+                'id': prof.id,
+                'name': prof.name,
+                'title': prof.title,
+                'specialization': prof.specialization,
+                'experience_years': prof.experience_years,
+                'rating': float(prof.rating) if prof.rating else 5.0,
+                'total_reviews': prof.total_reviews if prof.total_reviews else 0,
+                'languages': prof.languages,
+                'available_days': prof.available_days
+            }
+            prof_list.append(prof_data)
+            print(f"  ✓ Added: {prof.name}")
+        
+        print(f"✅ Returning {len(prof_list)} professionals")
+        return jsonify(prof_list), 200
+    
+    except Exception as e:
+        print(f"❌ Error in /api/professionals: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Could not fetch professionals',
+            'message': str(e)
+        }), 500
+        
+        
+
+@app.route('/chat/complete-booking', methods=['POST'])
+def complete_booking():
+    """Complete the appointment booking from chatbot"""
+    try:
+        # Get session ID
+        session_id = session.get('chatbot_session_id')
+        if not session_id or session_id not in chatbots:
+            return jsonify({'error': 'Invalid session'}), 400
+        
+        # Get booking data from chatbot
+        chatbot = chatbots[session_id]
+        booking_data = chatbot.get_booking_data()
+        
+        if not booking_data:
+            return jsonify({'error': 'No booking data found'}), 400
+        
+        # Validate required fields
+        required_fields = ['professional_id', 'name', 'email', 'phone', 'service', 'date', 'time']
+        for field in required_fields:
+            if field not in booking_data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # Convert date and time strings to proper types
+        appointment_date = datetime.strptime(booking_data['date'], '%Y-%m-%d').date()
+        appointment_time = datetime.strptime(booking_data['time'], '%H:%M').time()
+        
+        # Check if professional exists
+        professional = Professional.query.get(booking_data['professional_id'])
+        if not professional:
+            return jsonify({'error': 'Professional not found'}), 404
+        
+        # Check for existing appointment at same time
+        existing = Appointment.query.filter_by(
+            professional_id=booking_data['professional_id'],
+            date=appointment_date,
+            time=appointment_time
+        ).first()
+        
+        if existing:
+            return jsonify({
+                'error': 'This time slot is already booked',
+                'message': 'This time slot is already booked. Please choose another time.'
+            }), 409
+        
+        # Get user_id if logged in
+        user_id = session.get('user_id')
+        
+        # Create appointment
+        appointment = Appointment(
+            user_id=user_id,
+            user_name=booking_data['name'],
+            user_email=booking_data['email'],
+            user_phone=booking_data['phone'],
+            service=booking_data['service'],
+            professional_id=booking_data['professional_id'],
+            date=appointment_date,
+            time=appointment_time,
+            message="Booked via AI Chatbot"
+        )
+        
+        db.session.add(appointment)
+        db.session.commit()
+        
+        # Send confirmation email (if you have email service set up)
+        try:
+            from email_service import send_appointment_confirmation
+            send_appointment_confirmation(appointment)
+        except ImportError:
+            print("Email service not available")
+        except Exception as e:
+            print(f"Error sending confirmation email: {str(e)}")
+        
+        # Reset booking state in chatbot
+        chatbot.reset_booking()
+        
+        # Return success response
+        return jsonify({
+            'success': True,
+            'appointment_id': appointment.id,
+            'message': 'Appointment booked successfully!',
+            'appointment': {
+                'id': appointment.id,
+                'professional_name': professional.name,
+                'date': appointment.date.strftime('%B %d, %Y'),
+                'time': appointment.time.strftime('%I:%M %p'),
+                'service': appointment.service,
+                'status': appointment.status
+            }
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error completing booking: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'Failed to complete booking. Please try again.'}), 500
+
+@app.route('/chat/cancel-booking', methods=['POST'])
+def cancel_booking():
+    """Cancel the current booking process"""
+    try:
+        session_id = session.get('chatbot_session_id')
+        if session_id and session_id in chatbots:
+            chatbot = chatbots[session_id]
+            chatbot.reset_booking()
+        
+        return jsonify({'success': True, 'message': 'Booking cancelled'})
+    
+    except Exception as e:
+        print(f"❌ Error cancelling booking: {str(e)}")
+        return jsonify({'error': 'Could not cancel booking'}), 500
 
 @app.route('/chat/load', methods=['POST'])
 def load_chat_history():

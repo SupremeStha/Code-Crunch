@@ -15,6 +15,14 @@
         padding: 2rem 0;
         display: flex;
         align-items: center;
+        justify-content: center;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chatbot-page.maximized {
+        padding: 0;
+        align-items: flex-start;
+        justify-content: center;
     }
 
     .container {
@@ -22,11 +30,31 @@
         margin: 0 auto;
         padding: 0 2rem;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .container.maximized {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        height: 100%;
     }
 
     .page-title {
         text-align: center;
         margin-bottom: 0.5rem;
+        opacity: 1;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .page-title.hidden {
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        overflow: hidden;
     }
 
     .page-title h1 {
@@ -40,6 +68,15 @@
         color: #b8860b;
         font-size: 1rem;
         margin-bottom: 1.5rem;
+        opacity: 1;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .page-subtitle.hidden {
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        overflow: hidden;
     }
 
     .chat-container {
@@ -52,6 +89,14 @@
         height: calc(100vh - 250px);
         min-height: 500px;
         max-height: 650px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chat-container.maximized {
+        border-radius: 0;
+        height: calc(100vh - 56px);
+        max-height: calc(98vh - 56px);
+        box-shadow: none;
     }
 
     .chat-header {
@@ -64,7 +109,7 @@
     }
 
     .chat-header::before {
-        content: '';
+        content: "";
         position: absolute;
         top: -50%;
         right: -10%;
@@ -75,7 +120,7 @@
     }
 
     .chat-header::after {
-        content: '';
+        content: "";
         position: absolute;
         bottom: -30%;
         left: -5%;
@@ -101,11 +146,17 @@
         z-index: 1;
     }
 
-    .clear-chat-btn {
+    .header-actions {
         position: absolute;
         right: 1.5rem;
         top: 50%;
         transform: translateY(-50%);
+        display: flex;
+        gap: 0.5rem;
+        z-index: 2;
+    }
+
+    .header-btn {
         background: rgba(255, 255, 255, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.3);
         color: white;
@@ -113,13 +164,28 @@
         border-radius: 20px;
         cursor: pointer;
         font-size: 0.85rem;
-        z-index: 2;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .clear-chat-btn:hover {
+    .header-btn:hover {
         background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-50%) scale(1.05);
+        transform: scale(1.05);
+    }
+
+    .header-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .maximize-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
     }
 
     .chat-messages {
@@ -190,7 +256,7 @@
     }
 
     .message.user .message-avatar {
-        background: linear-gradient(135deg, #4CAF50, #45a049);
+        background: linear-gradient(135deg, #4caf50, #45a049);
         color: white;
     }
 
@@ -374,13 +440,137 @@
         font-weight: 700;
     }
 
+    /* Booking Success Modal Styles */
+    .booking-success-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .booking-success-modal.show {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .booking-success-content {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+        text-align: center;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        animation: scaleIn 0.5s ease;
+    }
+
+    @keyframes scaleIn {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .success-icon svg {
+        width: 50px;
+        height: 50px;
+        color: white;
+        stroke-width: 3;
+    }
+
+    .booking-details {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        text-align: left;
+    }
+
+    .booking-detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .booking-detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .booking-detail-label {
+        color: #666;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .booking-detail-value {
+        color: #2d3748;
+        font-weight: 500;
+    }
+
+    /* Booking Loading Spinner */
+    .booking-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(25, 118, 210, 0.2);
+        border-top-color: #1976d2;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        flex-shrink: 0;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
         .chatbot-page {
             padding: 1rem 0;
         }
 
+        .chatbot-page.maximized {
+            padding: 0;
+        }
+
         .container {
             padding: 0 1rem;
+        }
+
+        .container.maximized {
+            padding: 0;
         }
 
         .page-title h1 {
@@ -392,6 +582,10 @@
             border-radius: 15px;
         }
 
+        .chat-container.maximized {
+            border-radius: 0;
+        }
+
         .chat-header {
             padding: 1.25rem 1.5rem;
         }
@@ -400,10 +594,14 @@
             font-size: 1.25rem;
         }
 
-        .clear-chat-btn {
+        .header-actions {
             position: static;
             transform: none;
             margin-top: 0.5rem;
+            justify-content: center;
+        }
+
+        .header-btn {
             font-size: 0.75rem;
             padding: 0.4rem 0.8rem;
         }
@@ -435,20 +633,27 @@
     }
 </style>
 
-<div class="chatbot-page">
-    <div class="container">
-        <div class="page-title">
+<div class="chatbot-page" id="chatbotPage">
+    <div class="container" id="chatContainer">
+        <div class="page-title" id="pageTitle">
             <h1>AI Mental Health Support</h1>
         </div>
-        <div class="page-subtitle">
+        <div class="page-subtitle" id="pageSubtitle">
             Chat with our AI assistant for immediate support and guidance
         </div>
 
-        <div class="chat-container">
+        <div class="chat-container" id="chatBox">
             <div class="chat-header">
                 <h2>Mental Health Assistant</h2>
                 <p>Available 24/7 for mental health support</p>
-                <button class="clear-chat-btn" id="clearChatBtn">Clear Chat</button>
+                <div class="header-actions">
+                    <button class="header-btn maximize-btn" id="maximizeBtn" title="Maximize">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                    </button>
+                    <button class="header-btn" id="clearChatBtn">Clear Chat</button>
+                </div>
             </div>
 
             <div class="chat-messages" id="chatMessages">
@@ -479,25 +684,98 @@
     </div>
 </div>
 
+<!-- Booking Success Modal -->
+<div class="booking-success-modal" id="bookingSuccessModal">
+    <div class="booking-success-content">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <h2 style="color: #2d3748; margin-bottom: 0.5rem">Appointment Booked!</h2>
+        <p style="color: #666; margin-bottom: 1.5rem">Your appointment has been successfully scheduled.</p>
+        <div class="booking-details" id="bookingDetails"></div>
+        <div style="background: #e3f2fd; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+            <p style="color: #1976d2; font-size: 0.9rem; margin: 0; line-height: 1.5;">
+                📧 <strong>Check your email</strong> for confirmation and further details.
+            </p>
+        </div>
+        <button onclick="closeBookingModal()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #d4a574, #c8956d); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+            Continue Chatting
+        </button>
+    </div>
+</div>
+
 <script>
     const messageInput = document.getElementById("messageInput");
     const sendBtn = document.getElementById("sendBtn");
     const chatMessages = document.getElementById("chatMessages");
     const charCounter = document.getElementById("charCounter");
     const clearChatBtn = document.getElementById("clearChatBtn");
+    const maximizeBtn = document.getElementById("maximizeBtn");
+    const chatbotPage = document.getElementById("chatbotPage");
+    const chatContainer = document.getElementById("chatContainer");
+    const chatBox = document.getElementById("chatBox");
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubtitle = document.getElementById("pageSubtitle");
 
     const STORAGE_KEY = "mental_health_chat_history";
+    let isMaximized = false;
+
+    // Maximize/Minimize functionality
+    maximizeBtn.addEventListener("click", function() {
+        isMaximized = !isMaximized;
+        
+        if (isMaximized) {
+            // Maximize
+            chatbotPage.classList.add("maximized");
+            chatContainer.classList.add("maximized");
+            chatBox.classList.add("maximized");
+            pageTitle.classList.add("hidden");
+            pageSubtitle.classList.add("hidden");
+            
+            // Change icon to minimize
+            maximizeBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+                </svg>
+            `;
+            maximizeBtn.title = "Minimize";
+            console.log("✨ Chatbot maximized");
+        } else {
+            // Minimize (restore)
+            chatbotPage.classList.remove("maximized");
+            chatContainer.classList.remove("maximized");
+            chatBox.classList.remove("maximized");
+            pageTitle.classList.remove("hidden");
+            pageSubtitle.classList.remove("hidden");
+            
+            // Change icon back to maximize
+            maximizeBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            `;
+            maximizeBtn.title = "Maximize";
+            console.log("✨ Chatbot minimized");
+        }
+        
+        // Scroll to bottom after animation
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 400);
+    });
 
     // Character counter
-    messageInput.addEventListener('input', function() {
+    messageInput.addEventListener("input", function () {
         const length = this.value.length;
         charCounter.textContent = `${length}/500`;
-        
-        charCounter.classList.remove('warning', 'danger');
+
+        charCounter.classList.remove("warning", "danger");
         if (length > 450) {
-            charCounter.classList.add('danger');
+            charCounter.classList.add("danger");
         } else if (length > 400) {
-            charCounter.classList.add('warning');
+            charCounter.classList.add("warning");
         }
     });
 
@@ -526,11 +804,11 @@
         if (confirm("Are you sure you want to clear the chat history? This cannot be undone.")) {
             try {
                 localStorage.removeItem(STORAGE_KEY);
-                
+
                 // Reset chat on server
                 fetch("/chat/reset", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" }
+                    headers: { "Content-Type": "application/json" },
                 });
 
                 // Clear UI
@@ -544,7 +822,7 @@
                         <span><strong>Privacy Note:</strong> This is a supportive AI assistant. For emergencies, please contact your local crisis hotline.</span>
                     </div>
                 `;
-                
+
                 addInitialMessage();
             } catch (e) {
                 console.error("Error clearing chat:", e);
@@ -553,16 +831,26 @@
     }
 
     function addMessage(content, isUser = false, skipSave = false) {
+        if (!content || content.trim() === '') {
+            return;
+        }
+        
         const messageDiv = document.createElement("div");
         messageDiv.className = `message ${isUser ? "user" : "ai"}`;
         messageDiv.innerHTML = `
             <div class="message-avatar">${isUser ? "You" : "AI"}</div>
             <div class="message-content">
-                ${isUser ? content : (content.startsWith("🤖") ? content : "🤖 " + content)}
+                ${content}
             </div>
         `;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Check if this message needs to load professionals
+        if (!isUser && !skipSave && content.includes('data-load-professionals="true"')) {
+            console.log("🔍 Detected professional loading trigger");
+            loadAndDisplayProfessionals();
+        }
 
         // Save to localStorage
         if (!skipSave) {
@@ -570,14 +858,18 @@
             history.push({
                 role: isUser ? "user" : "assistant",
                 content: content,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             });
             saveChatHistory(history);
         }
     }
 
     function addInitialMessage() {
-        addMessage("Hello! I'm here to provide mental health support and guidance. How are you feeling today?", false, true);
+        addMessage(
+            "Hello! I'm here to provide mental health support and guidance. How are you feeling today? I can also help you book an appointment with one of our professionals if you'd like.",
+            false,
+            true
+        );
     }
 
     function showTypingIndicator() {
@@ -607,7 +899,7 @@
     // Restore chat history on page load
     function restoreChatHistory() {
         const history = loadChatHistory();
-        
+
         if (history.length === 0) {
             addInitialMessage();
         } else {
@@ -615,13 +907,22 @@
             fetch("/chat/load", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ history })
+                body: JSON.stringify({ history }),
             }).catch(console.error);
 
             // Display messages
-            history.forEach(msg => {
+            history.forEach((msg) => {
                 const isUser = msg.role === "user";
-                addMessage(msg.content, isUser, true);
+                let content = msg.content;
+
+                if (!isUser && content.includes('data-load-professionals="true"')) {
+                    content = content.replace(/<div data-load-professionals="true"><\/div>/g, "");
+                    if (content.includes("Loading our available professionals")) {
+                        content = content.replace("Loading our available professionals...", "Professional list was shown here.");
+                    }
+                }
+
+                addMessage(content, isUser, true);
             });
         }
     }
@@ -633,7 +934,7 @@
         addMessage(message, true);
         messageInput.value = "";
         charCounter.textContent = "0/500";
-        charCounter.classList.remove('warning', 'danger');
+        charCounter.classList.remove("warning", "danger");
         messageInput.disabled = true;
         sendBtn.disabled = true;
 
@@ -651,7 +952,16 @@
             const data = await response.json();
 
             removeTypingIndicator();
-            addMessage(data.response);
+
+            // Only add message if response is not empty
+            if (data.response && data.response.trim() !== "") {
+                addMessage(data.response);
+            }
+
+            // Check if booking is complete
+            if (data.booking_complete) {
+                await completeBooking();
+            }
         } catch (error) {
             console.error("Error:", error);
             removeTypingIndicator();
@@ -660,6 +970,229 @@
             messageInput.disabled = false;
             sendBtn.disabled = false;
             messageInput.focus();
+        }
+    }
+
+    async function completeBooking() {
+        try {
+            showBookingLoadingMessage();
+
+            const response = await fetch("/chat/complete-booking", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            const data = await response.json();
+
+            removeBookingLoadingMessage();
+
+            if (data.success) {
+                showBookingSuccess(data.appointment);
+            } else {
+                addMessage(`❌ Error: ${data.error || data.message || "Could not complete booking. Please try again."}`);
+            }
+        } catch (error) {
+            console.error("Error completing booking:", error);
+            removeBookingLoadingMessage();
+            addMessage("❌ Error completing booking. Please try the regular booking form or try again later.");
+        }
+    }
+
+    function showBookingSuccess(appointment) {
+        const modal = document.getElementById("bookingSuccessModal");
+        const detailsContainer = document.getElementById("bookingDetails");
+
+        detailsContainer.innerHTML = `
+            <div class="booking-detail-row">
+                <span class="booking-detail-label">Appointment ID:</span>
+                <span class="booking-detail-value">#${appointment.id}</span>
+            </div>
+            <div class="booking-detail-row">
+                <span class="booking-detail-label">Professional:</span>
+                <span class="booking-detail-value">${appointment.professional_name}</span>
+            </div>
+            <div class="booking-detail-row">
+                <span class="booking-detail-label">Service:</span>
+                <span class="booking-detail-value">${appointment.service}</span>
+            </div>
+            <div class="booking-detail-row">
+                <span class="booking-detail-label">Date:</span>
+                <span class="booking-detail-value">${appointment.date}</span>
+            </div>
+            <div class="booking-detail-row">
+                <span class="booking-detail-label">Time:</span>
+                <span class="booking-detail-value">${appointment.time}</span>
+            </div>
+            <div class="booking-detail-row">
+                <span class="booking-detail-label">Status:</span>
+                <span class="booking-detail-value" style="color: #f39c12; font-weight: 600;">${appointment.status}</span>
+            </div>
+        `;
+
+        modal.classList.add("show");
+    }
+
+    function closeBookingModal() {
+        const modal = document.getElementById("bookingSuccessModal");
+        modal.classList.remove("show");
+
+        addMessage("Your appointment has been booked! You can check the status anytime. Is there anything else I can help you with?");
+    }
+
+    window.selectProfessional = function (profId, profName) {
+        const messageInput = document.getElementById("messageInput");
+        messageInput.value = `I want to book with professional ID ${profId}`;
+        document.getElementById("sendBtn").click();
+    };
+
+    async function loadAndDisplayProfessionals() {
+        console.log("📡 Fetching professionals from API...");
+
+        try {
+            const response = await fetch("/api/professionals");
+            console.log("📊 Response status:", response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const professionals = await response.json();
+            console.log("✅ Received professionals:", professionals.length);
+
+            if (professionals.length === 0) {
+                addProfessionalMessage('<p style="color: #e74c3c; text-align: center; padding: 20px; margin: 10px 0; background: #fff; border-radius: 10px;">❌ No professionals available at the moment. Please try again later.</p>');
+                return;
+            }
+
+            let html = '<div style="margin-top: 15px;"><h4 style="color: #2d3748; margin-bottom: 15px; font-size: 16px;">👨‍⚕️ Select a Professional:</h4>';
+            html += '<div style="display: grid; gap: 12px;">';
+
+            professionals.forEach((prof) => {
+                const initial = prof.name.charAt(0).toUpperCase();
+                const specializationPreview = prof.specialization.split(",")[0].trim();
+
+                html += `
+                    <div class="prof-card" data-prof-id="${prof.id}" style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: all 0.3s; border: 2px solid transparent;">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #d4a574, #c8956d); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <span style="color: white; font-weight: bold; font-size: 20px;">${initial}</span>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <h5 style="margin: 0 0 5px 0; color: #2d3748; font-size: 15px; font-weight: 600;">${prof.name}</h5>
+                                <p style="margin: 0 0 3px 0; color: #b8860b; font-size: 12px; font-weight: 500;">${prof.title}</p>
+                                <p style="margin: 0; color: #666; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${specializationPreview}</p>
+                            </div>
+                            <div style="text-align: right; flex-shrink: 0;">
+                                <div style="color: #ffc107; font-size: 13px; margin-bottom: 3px;">⭐ ${prof.rating}</div>
+                                <div style="color: #666; font-size: 10px;">${prof.experience_years}y exp</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += "</div></div>";
+
+            addProfessionalMessage(html);
+
+            setTimeout(() => {
+                document.querySelectorAll(".prof-card").forEach((card) => {
+                    card.addEventListener("click", function () {
+                        const profId = this.getAttribute("data-prof-id");
+                        console.log("👆 Professional selected:", profId);
+                        selectProfessional(profId, "");
+                    });
+
+                    card.addEventListener("mouseenter", function () {
+                        this.style.transform = "translateY(-2px)";
+                        this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+                        this.style.borderColor = "#d4a574";
+                    });
+
+                    card.addEventListener("mouseleave", function () {
+                        this.style.transform = "translateY(0)";
+                        this.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                        this.style.borderColor = "transparent";
+                    });
+                });
+                console.log("✅ Click handlers attached to", professionals.length, "cards");
+            }, 100);
+        } catch (error) {
+            console.error("❌ Error loading professionals:", error);
+            addProfessionalMessage(`
+                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    <p style="margin: 0; color: #856404; font-size: 14px;">
+                        ⚠️ <strong>Error loading professionals.</strong><br>
+                        Please refresh the page or try again later.
+                    </p>
+                </div>
+            `);
+        }
+    }
+
+    function addProfessionalMessage(html) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "message ai professional-list-message";
+        messageDiv.innerHTML = `
+            <div class="message-avatar">AI</div>
+            <div class="message-content">
+                ${html}
+            </div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showBookingLoadingMessage() {
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "message ai";
+        loadingDiv.id = "bookingLoadingIndicator";
+        loadingDiv.innerHTML = `
+            <div class="message-avatar">AI</div>
+            <div class="message-content">
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="booking-spinner"></div>
+                        <div>
+                            <p style="margin: 0 0 5px 0; color: #1976d2; font-size: 16px; font-weight: 600;">
+                                Processing your appointment...
+                            </p>
+                            <p style="margin: 0; color: #0d47a1; font-size: 13px;" id="loadingText">
+                                Checking availability...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(loadingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        const messages = [
+            "Checking availability...",
+            "Confirming time slot...",
+            "Creating appointment...",
+            "Sending confirmation...",
+            "Almost done...",
+        ];
+        let messageIndex = 0;
+
+        window.loadingTextInterval = setInterval(() => {
+            messageIndex = (messageIndex + 1) % messages.length;
+            const loadingText = document.getElementById("loadingText");
+            if (loadingText) {
+                loadingText.textContent = messages[messageIndex];
+            }
+        }, 800);
+    }
+
+    function removeBookingLoadingMessage() {
+        const loadingIndicator = document.getElementById("bookingLoadingIndicator");
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+        if (window.loadingTextInterval) {
+            clearInterval(window.loadingTextInterval);
         }
     }
 

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Professional Cards Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .prof-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .prof-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: #d4a574;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Professional Cards Test</h1>
+    
+    <div class="test-box">
+        <h2>Step 1: Test API</h2>
+        <p>First, let's verify the API is working:</p>
+        <button onclick="testAPI()">Test /api/professionals</button>
+        <div id="apiResult"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Step 2: Load Professional Cards</h2>
+        <p>This simulates what happens in the chatbot:</p>
+        <button onclick="loadProfessionals()">Load Professionals</button>
+        <div id="professionalsList"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Step 3: Test Selection</h2>
+        <p id="selectionResult">Click a professional card above to test selection</p>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                console.log('🔍 Testing API...');
+                const response = await fetch('/api/professionals');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ API Response:', data);
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✅ API Working!</p>
+                    <p>Found ${data.length} professional(s)</p>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow: auto;">${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('❌ API Error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">❌ API Failed: ${error.message}</p>
+                    <p>Make sure Flask server is running and route exists.</p>
+                `;
+            }
+        }
+
+        async function loadProfessionals() {
+            const container = document.getElementById('professionalsList');
+            container.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                console.log('📡 Fetching professionals...');
+                const response = await fetch('/api/professionals');
+                const professionals = await response.json();
+                
+                console.log('👥 Loaded:', professionals.length, 'professionals');
+                
+                if (professionals.length === 0) {
+                    container.innerHTML = '<p class="error">No professionals found</p>';
+                    return;
+                }
+                
+                let html = '<h3>Available Professionals:</h3>';
+                
+                professionals.forEach((prof) => {
+                    const initial = prof.name.charAt(0).toUpperCase();
+                    
+                    html += `
+                        <div class="prof-card" onclick="selectProf(${prof.id}, '${prof.name}')">
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #d4a574, #c8956d); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: white; font-weight: bold; font-size: 20px;">${initial}</span>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0 0 5px 0; color: #2d3748;">${prof.name}</h4>
+                                    <p style="margin: 0 0 3px 0; color: #b8860b; font-size: 13px;">${prof.title}</p>
+                                    <p style="margin: 0; color: #666; font-size: 12px;">${prof.specialization.split(',')[0]}</p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="color: #ffc107;">⭐ ${prof.rating}</div>
+                                    <div style="color: #666; font-size: 12px;">${prof.experience_years} years</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                console.log('✅ Cards rendered!');
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                container.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            }
+        }
+
+        function selectProf(id, name) {
+            console.log('✅ Selected:', id, name);
+            document.getElementById('selectionResult').innerHTML = `
+                <p class="success">✅ Selected: ${name} (ID: ${id})</p>
+                <p>In the real chatbot, this would send: "I want to book with professional ID ${id}"</p>
+            `;
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            console.log('🚀 Test page loaded');
+            console.log('Click "Test API" button to start');
+        };
+    </script>
+</body>
+</html>
