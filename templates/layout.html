@@ -540,13 +540,12 @@
                 {% else %}
                     <!-- Show when user is not logged in -->
                     <div class="user-menu">
-                        <a href="{{ url_for('login') }}" class="sign-in-btn">Sign In</a>
-                        <a href="{{ url_for('register') }}" class="sign-in-btn" style="background-color: #925429;">Register</a>
+                        <a href="{{ url_for('login') }}" class="sign-in-btn" style="background-color: #925429;"">Sign In</a>
                     </div>
                 {% endif %}
                 
                 <!-- Admin button (always visible) -->
-                <a href="{{ url_for('admin_login') }}" class="sign-in-btn" style="background-color: #2d3748;">Admin</a>
+                <a href="{{ url_for('admin_login') }}" class="sign-in-btn" style="background-color: #000000;">Admin</a>
             </div>
         </nav>
 
@@ -577,7 +576,6 @@
                         <li><a href="{{ url_for('user_dashboard') }}">My Dashboard</a></li>
                         {% else %}
                         <li><a href="{{ url_for('login') }}">Sign In</a></li>
-                        <li><a href="{{ url_for('register') }}">Register</a></li>
                         {% endif %}
                     </ul>
                 </div>

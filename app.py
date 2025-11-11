@@ -941,7 +941,7 @@ def admin_login():
         else:
             flash('Invalid credentials', 'error')
     
-    return render_template('admin_login.html')
+    return render_template('admin/admin_login.html')
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
@@ -954,7 +954,7 @@ def admin_dashboard():
         Appointment.time.asc()
     ).all()
     
-    return render_template('admin_dashboard.html', appointments=appointments)
+    return render_template('admin/admin_dashboard.html', appointments=appointments)
 
 @app.route('/admin/professionals')
 def admin_professionals():
@@ -963,7 +963,7 @@ def admin_professionals():
         return redirect(url_for('admin_login'))
     
     all_professionals = Professional.query.all()
-    return render_template('admin_professionals.html', professionals=all_professionals)
+    return render_template('admin/admin_professionals.html', professionals=all_professionals)
 
 @app.route('/admin/professional/add', methods=['GET', 'POST'])
 def add_professional():
@@ -979,7 +979,7 @@ def add_professional():
             for field in required_fields:
                 if not request.form.get(field):
                     flash(f'Please fill in all required fields.', 'danger')
-                    return render_template('admin_add_professional.html')
+                    return render_template('admin/admin_add_professional.html')
             
             professional = Professional(
                 name=request.form['name'],
@@ -1004,14 +1004,14 @@ def add_professional():
             
         except ValueError as e:
             flash('Please enter a valid number for years of experience.', 'danger')
-            return render_template('admin_add_professional.html')
+            return render_template('admin/admin_add_professional.html')
         except Exception as e:
             db.session.rollback()
             print(f"Error adding professional: {str(e)}")
             flash('Error adding professional. Please try again.', 'danger')
-            return render_template('admin_add_professional.html')
+            return render_template('admin/admin_add_professional.html')
     
-    return render_template('admin_add_professional.html')
+    return render_template('admin/admin_add_professional.html')
 
 @app.route('/admin/professional/edit/<int:prof_id>', methods=['GET', 'POST'])
 def edit_professional(prof_id):
@@ -1027,7 +1027,7 @@ def edit_professional(prof_id):
             for field in required_fields:
                 if not request.form.get(field):
                     flash(f'Please fill in all required fields.', 'danger')
-                    return render_template('admin_edit_professional.html', professional=professional)
+                    return render_template('admin/admin_edit_professional.html', professional=professional)
             
             professional.name = request.form['name']
             professional.title = request.form['title']
@@ -1052,14 +1052,14 @@ def edit_professional(prof_id):
             
         except ValueError as e:
             flash('Please enter a valid number for years of experience.', 'danger')
-            return render_template('admin_edit_professional.html', professional=professional)
+            return render_template('admin/admin_edit_professional.html', professional=professional)
         except Exception as e:
             db.session.rollback()
             print(f"Error updating professional: {str(e)}")
             flash('Error updating professional. Please try again.', 'danger')
-            return render_template('admin_edit_professional.html', professional=professional)
+            return render_template('admin/admin_edit_professional.html', professional=professional)
     
-    return render_template('admin_edit_professional.html', professional=professional)
+    return render_template('admin/admin_edit_professional.html', professional=professional)
 
 @app.route('/admin/professional/delete/<int:prof_id>')
 def delete_professional(prof_id):
@@ -1146,7 +1146,7 @@ def admin_reviews():
     
     reviews = Review.query.order_by(Review.created_at.desc()).all()
     
-    return render_template('admin_reviews.html', reviews=reviews)
+    return render_template('admin/admin_reviews.html', reviews=reviews)
 
 @app.route('/admin/review/<int:review_id>/approve', methods=['POST'])
 def approve_review(review_id):
