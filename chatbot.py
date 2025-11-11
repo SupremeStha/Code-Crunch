@@ -41,17 +41,43 @@ class MentalHealthChatbot:
             "step": None,
             "data": {}
         }
+
+        self.last_breathwork_time = None
+        self.last_breathwork_emotion = None
+        self.BREATHWORK_COOLDOWN_MINUTES = 10
         
     def detect_booking_intent(self, user_message: str) -> bool:
         """Detect if user wants to book an appointment"""
         booking_keywords = [
             "book", "appointment", "schedule", "meet", "session",
             "talk to professional", "see a therapist", "consultation",
-            "need help from professional", "therapist", "counselor"
+            "need help from professional", "therapist", "counselor",
+            "make an appointment", "want to book", "would like to schedule",
+            "set up appointment", "make appointment", "need appointment",
+            "want appointment", "looking for therapist", "professional help"
         ]
         
         message_lower = user_message.lower()
-        return any(keyword in message_lower for keyword in booking_keywords)
+        
+        # Check for exact phrases as well
+        booking_phrases = [
+            "make appointment",
+            "make an appointment", 
+            "want to book",
+            "would like to book",
+            "schedule appointment",
+            "set up an appointment",
+            "need an appointment",
+            "want an appointment"
+        ]
+        
+        # Check for keywords
+        keyword_match = any(keyword in message_lower for keyword in booking_keywords)
+        
+        # Check for exact phrases
+        phrase_match = any(phrase in message_lower for phrase in booking_phrases)
+        
+        return keyword_match or phrase_match
     
     def extract_booking_info(self, user_message: str, current_step: str) -> Optional[str]:
         """Extract relevant information based on booking step"""
@@ -131,7 +157,7 @@ class MentalHealthChatbot:
             "data": {}
         }
         
-        # Return a message that tells the frontend to fetch and display professionals
+        # Return the initial booking message
         return """
 <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 20px; border-radius: 12px; margin-top: 15px; box-shadow: 0 4px 15px rgba(168, 237, 234, 0.3);">
     <div style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -153,6 +179,161 @@ class MentalHealthChatbot:
 <div data-load-professionals="true"></div>
 """
     
+    def detect_emotion(self, text):
+        text = text.lower()
+        emotion_keywords = {
+            "sad": ["sad", "depressed", "lonely", "hopeless", "tired", "cry"],
+            "angry": ["angry", "mad", "furious", "annoyed", "rage"],
+            "anxious": ["anxious", "worried", "nervous", "scared", "afraid"],
+            "happy": ["happy", "grateful", "excited", "glad", "good", "great"],
+            "neutral": ["okay", "fine", "alright", "normal"],
+        }
+
+        for emotion, words in emotion_keywords.items():
+            if any(word in text for word in words):
+                return emotion
+        return "neutral"
+    
+    def get_tone_instruction(self, emotion):
+        tone_map = {
+            "sad": "Respond with a gentle, empathetic, and supportive tone.",
+            "angry": "Respond calmly and patiently, helping the user cool down without invalidating their feelings.",
+            "anxious": "Respond in a soothing and reassuring tone, focusing on safety and calm.",
+            "happy": "Respond in an encouraging and warm tone, maintaining their positive energy.",
+            "neutral": "Respond with a balanced, understanding, and conversational tone.",
+        }
+        return tone_map.get(emotion, tone_map["neutral"])
+    
+    def suggest_breathwork(self, emotion):
+        breathwork_guides = {
+            "anxious": {
+                "title": "Box Breathing",
+                "subtitle": "Calm your anxious mind",
+                "icon": "🧘‍♀️",
+                "color": "linear-gradient(135deg, #a8edea 0%, #89d4f7 100%)",
+                "steps": [
+                    {"action": "Inhale", "duration": "4 seconds", "icon": "🫁", "desc": "Breathe in slowly through your nose"},
+                    {"action": "Hold", "duration": "4 seconds", "icon": "✋", "desc": "Keep the air in your lungs"},
+                    {"action": "Exhale", "duration": "4 seconds", "icon": "💨", "desc": "Release slowly through your mouth"},
+                    {"action": "Hold", "duration": "4 seconds", "icon": "🕓", "desc": "Pause before the next breath"}
+                ],
+                "repetitions": "Repeat this cycle 4-5 times"
+            },
+            "angry": {
+                "title": "4-7-8 Breathing",
+                "subtitle": "Release tension and calm down",
+                "icon": "🌊",
+                "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+                "steps": [
+                    {"action": "Inhale", "duration": "4 seconds", "icon": "🌬️", "desc": "Breathe in deeply through your nose"},
+                    {"action": "Hold", "duration": "7 seconds", "icon": "🕰️", "desc": "Hold your breath gently"},
+                    {"action": "Exhale", "duration": "8 seconds", "icon": "💨", "desc": "Exhale completely through your mouth"}
+                ],
+                "repetitions": "Repeat 3-4 times to calm your nervous system"
+            },
+            "sad": {
+                "title": "Calm Flow Breathing",
+                "subtitle": "Ground yourself and find peace",
+                "icon": "🌿",
+                "color": "linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)",
+                "steps": [
+                    {"action": "Inhale", "duration": "5 seconds", "icon": "🫁", "desc": "Take a deep, gentle breath in"},
+                    {"action": "Exhale", "duration": "5 seconds", "icon": "💨", "desc": "Release slowly and completely"}
+                ],
+                "repetitions": "Place a hand on your chest to feel the rhythm. You're safe here."
+            },
+            "neutral": {
+                "title": "Mindful Breathing",
+                "subtitle": "Take a peaceful pause",
+                "icon": "🌸",
+                "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+                "steps": [
+                    {"action": "Inhale", "duration": "4 seconds", "icon": "🫁", "desc": "Breathe in slowly and naturally"},
+                    {"action": "Exhale", "duration": "4 seconds", "icon": "💨", "desc": "Release gently and easily"}
+                ],
+                "repetitions": "Continue for one minute - even calm moments deserve calm breaths"
+            }
+        }
+        
+        guide = breathwork_guides.get(emotion)
+        if not guide:
+            return ""
+        
+        # Build step cards
+        steps_html = ""
+        for i, step in enumerate(guide["steps"], 1):
+            steps_html += f"""
+            <div style="background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid rgba(45, 55, 72, 0.2);">
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <div style="background: rgba(168, 237, 234, 0.3); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 18px;">
+                        {step['icon']}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: baseline; gap: 8px;">
+                            <span style="color: #2d3748; font-size: 16px; font-weight: 700;">{step['action']}</span>
+                            <span style="color: #4a5568; font-size: 14px; font-weight: 600;">• {step['duration']}</span>
+                        </div>
+                    </div>
+                </div>
+                <p style="margin: 0; color: #4a5568; font-size: 14px; line-height: 1.5; padding-left: 44px;">
+                    {step['desc']}
+                </p>
+            </div>
+            """
+        
+        return f"""
+    <div style="background: {guide['color']}; padding: 24px; border-radius: 16px; margin-top: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 2px solid rgba(255,255,255,0.5);">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 48px; margin-bottom: 8px;">{guide['icon']}</div>
+            <h3 style="margin: 0 0 4px 0; color: #2d3748; font-size: 22px; font-weight: 800;">
+                {guide['title']}
+            </h3>
+            <p style="margin: 0; color: #4a5568; font-size: 15px; font-weight: 500;">
+                {guide['subtitle']}
+            </p>
+        </div>
+        
+        <div style="background: rgba(255, 255, 255, 0.5); border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+            {steps_html}
+        </div>
+        
+        <div style="background: rgba(45, 55, 72, 0.08); border-radius: 10px; padding: 14px; text-align: center;">
+            <p style="margin: 0; color: #2d3748; font-size: 14px; font-weight: 600; line-height: 1.6;">
+                🔄 {guide['repetitions']}
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 16px;">
+            <p style="margin: 0; color: #2d3748; font-size: 13px; font-style: italic; opacity: 0.9;">
+                💙 Take your time. There's no rush. You've got this.
+            </p>
+        </div>
+    </div>
+    """
+
+    def should_show_breathwork(self, emotion: str) -> bool:
+        """Check if enough time has passed or emotion changed"""
+        from datetime import datetime, timedelta
+    
+        if self.last_breathwork_time is None:
+            return True
+    
+        current_time = datetime.now()
+        time_since_last = current_time - self.last_breathwork_time
+        cooldown_period = timedelta(minutes=self.BREATHWORK_COOLDOWN_MINUTES)
+    
+        # Show if cooldown passed OR emotion changed
+        if time_since_last >= cooldown_period or emotion != self.last_breathwork_emotion:
+            return True
+    
+        return False
+
+    def mark_breathwork_shown(self, emotion: str):
+        """Record that breathwork was shown"""
+        from datetime import datetime
+        self.last_breathwork_time = datetime.now()
+        self.last_breathwork_emotion = emotion
+
     def handle_booking_flow(self, user_message: str) -> tuple[str, bool]:
         """Handle the booking conversation flow
         Returns: (response_message, is_booking_complete)
@@ -394,6 +575,8 @@ class MentalHealthChatbot:
             if not validation['is_valid']:
                 return validation['message']
             
+            detected_emotion = self.detect_emotion(user_message)
+            
             # Check if booking is active
             if self.booking_state["active"]:
                 response, is_complete = self.handle_booking_flow(user_message)
@@ -472,16 +655,32 @@ class MentalHealthChatbot:
             
             if len(self.conversation_history) > MAX_CONVERSATION_LENGTH:
                 self.conversation_history = self.conversation_history[-MAX_CONVERSATION_LENGTH:]
-            
-            response = self.chat_session.send_message(user_message)
+
+            tone_instruction = self.get_tone_instruction(detected_emotion)
+
+            # Send message with tone instruction
+            enhanced_message = f"{tone_instruction}\n\nUser message: {user_message}"
+            response = self.chat_session.send_message(enhanced_message)
             bot_response = response.text
             
             # Add empathetic context based on message sentiment
             bot_response = self.crisis_handler.enhance_with_empathy(bot_response, user_message)
+
+            # Add breathwork suggestion for emotional states
+            
+            if detected_emotion in ["anxious", "angry", "sad"]:
+                if self.should_show_breathwork(detected_emotion):
+                    breathwork = self.suggest_breathwork(detected_emotion)
+                    if breathwork:
+                        bot_response += f"\n\n{breathwork}"
+                        self.mark_breathwork_shown(detected_emotion)
+
+            
             
             # Add styled informational messages
             if self.first_message:
                 first_msg_html = """
+                
 <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 20px; border-radius: 12px; margin-top: 15px; box-shadow: 0 4px 15px rgba(168, 237, 234, 0.3);">
     <div style="display: flex; align-items: center; margin-bottom: 10px;">
         <span style="font-size: 24px; margin-right: 10px;">💙</span>

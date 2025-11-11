@@ -12,33 +12,56 @@ class CrisisHandler:
         """Initialize all crisis detection keywords and patterns"""
         # Immediate crisis indicators
         self.immediate_keywords = [
+            # Self-harm patterns
             r'\bharm\b.*\bself\b|\bself.*\bharm\b',
+            r'\bharm\s*myself\b|\bcut\s*myself\b',
+            r'\bcausing\s+harm\b|\bwant.*harm\b|\bthinking.*harm\b',
+            r'\binjure\s+myself\b|\binjuring\s+myself\b',
+            
+            # Suicide patterns
             r'\bsuicide\b|\bkill\s*myself\b|\bend\s*my\s*life\b',
-            r'\bwant\s*to\s*die\b|\bwish\s*i\s*was\s*dead\b',
+            r'\bwant\s*to\s*die\b|\bwish\s*i\s*was\s*dead\b|\bbetter\s*off\s*dead\b',
             r'\bplan.*suicide\b|\bmethod.*suicide\b',
-            r'\bhurt\s*myself\b|\bcut\s*myself\b',
-            r'\boverdose\b|\btake\s*pills\b',
-            r'\bharm\s*others\b|\bhurt\s*someone\b',
+            r'\boverdose\b|\btake\s*pills\b|\btaking\s*pills\b',
+            r'\bjump\s+off\b|\bhanging\b|\bhang\s+myself\b',
+            
+            # Additional self-harm
+            r'\bhurt\s*myself\b|\bburning\s+myself\b',
+            r'\bpunish\s+myself\b|\bdeserve\s+pain\b',
+            
+            # Harm to others
+            r'\bharm\s*others\b|\bhurt\s*someone\b|\bhurt\s*people\b',
+            r'\bkill\s+someone\b|\bviolent\s+thoughts\b',
+            
+            # Child safety
             r'\babuse\b.*\bchild\b|\bchild.*\babuse\b',
+            r'\bharm.*\bchild\b|\bchild.*\bharm\b',
+            
+            # Immediate danger phrases
+            r'\bcan\'t\s+take\s+it\b|\bcan\'t\s+do\s+this\b',
+            r'\bending\s+it\s+all\b|\bgiving\s+up\b',
         ]
         
         # High risk indicators
         self.high_risk_keywords = [
-            r'\bno.*hope\b|\bhopeless\b',
-            r'\bcan\'t.*cope\b|\bcan\'t\s*handle\b',
-            r'\btrap.*\b|\btrapped\b',
-            r'\bbreaking\s*down\b|\bmental\s*breakdown\b',
-            r'\bspiraling\b|\bfalling\s*apart\b',
-            r'\bnothing\s*matters\b|\bno\s*point\b',
-            r'\bno\s*one\s*cares\b|\bcompletely\s*alone\b',
-            r'\bdesperate\b|\bcan\'t\s*go\s*on\b',
+            r'\bno.*hope\b|\bhopeless\b|\bno\s+way\s+out\b',
+            r'\bcan\'t.*cope\b|\bcan\'t\s*handle\b|\bcan\'t\s+bear\b',
+            r'\btrap.*\b|\btrapped\b|\bstuck\s+forever\b',
+            r'\bbreaking\s*down\b|\bmental\s*breakdown\b|\blosing\s+it\b',
+            r'\bspiraling\b|\bfalling\s*apart\b|\bfalling\s+apart\b',
+            r'\bnothing\s*matters\b|\bno\s*point\b|\bpointless\b',
+            r'\bno\s*one\s*cares\b|\bcompletely\s*alone\b|\bnobody\s+cares\b',
+            r'\bdesperate\b|\bcan\'t\s*go\s*on\b|\bcan\'t\s+continue\b',
+            r'\bbetter\s+off\s+without\s+me\b|\bburden\s+to\s+everyone\b',
+            r'\bgive\s+up\b|\bgave\s+up\b|\bgiving\s+up\b',
         ]
         
         # Moderate distress keywords
         self.moderate_keywords = [
-            'overwhelming', 'can\'t sleep', 'can\'t eat', 'anxious', 'panic',
+            'overwhelming', 'overwhelmed', "can't sleep", "can't eat", 'anxious', 'panic',
             'depressed', 'worthless', 'failing', 'struggling', 'exhausted',
-            'can\'t focus', 'numb', 'empty', 'hurt', 'pain', 'lonely'
+            "can't focus", 'numb', 'empty', 'hurt', 'pain', 'lonely', 'scared',
+            'terrified', 'breaking down', 'falling apart', 'drowning', 'suffocating'
         ]
         
         # Empathy context mapping
