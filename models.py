@@ -176,3 +176,25 @@ class Notification(db.Model):
     
     def __repr__(self):
         return f'<Notification {self.notification_type} to {self.user_email}>'
+    
+class Contact(db.Model):
+    """Contact/Support message model"""
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # User info
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(20), nullable=True)
+    subject = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    
+    # Status
+    status = db.Column(db.String(20), default='Unread')  # Unread, Read, Resolved
+    admin_notes = db.Column(db.Text, nullable=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Contact {self.name} - {self.subject}>'

@@ -295,3 +295,65 @@ def send_review_request_email(appointment):
     except Exception as e:
         print(f"Error sending review request email: {str(e)}")
         return False
+    
+def send_contact_confirmation(contact):
+    """Send confirmation email when user submits contact form"""
+    subject = "We've received your message"
+    
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #d4a574, #c8956d); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }}
+            .message-box {{ background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #c8956d; }}
+            .footer {{ text-align: center; color: #999; font-size: 12px; margin-top: 30px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>✉️ Message Received!</h1>
+                <p>Thank you for contacting us</p>
+            </div>
+            <div class="content">
+                <p>Dear {contact.name},</p>
+                <p>We've received your message and our team will review it shortly. We typically respond within 24-48 hours.</p>
+                
+                <div class="message-box">
+                    <h3 style="margin-top: 0; color: #c8956d;">Your Message Details</h3>
+                    <p><strong>Subject:</strong> {contact.subject}</p>
+                    <p><strong>Message ID:</strong> #{contact.id}</p>
+                    <p><strong>Submitted:</strong> {contact.created_at.strftime('%B %d, %Y at %I:%M %p')}</p>
+                </div>
+                
+                <p><strong>What happens next?</strong></p>
+                <ul>
+                    <li>Our support team will review your message</li>
+                    <li>We'll respond to your email address: {contact.email}</li>
+                    <li>You can reference Message ID #{contact.id} in any follow-up communication</li>
+                </ul>
+                
+                <p>If your matter is urgent, please call us directly during business hours.</p>
+                
+                <div class="footer">
+                    <p>Mental Health Platform | © 2025 All Rights Reserved</p>
+                    <p>This is an automated confirmation. Please do not reply to this email.</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    try:
+        msg = Message(subject, recipients=[contact.email])
+        msg.html = html_body
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending contact confirmation email: {str(e)}")
+        return False

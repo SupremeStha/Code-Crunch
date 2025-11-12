@@ -1,10 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
-from email_service import init_mail, send_appointment_confirmation
 from datetime import datetime, date, time, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+from email_service import init_mail, send_appointment_confirmation, send_contact_confirmation
 import secrets
 import os
 
@@ -16,7 +15,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-init_mail(app)
 
 # Email configuration
 app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
@@ -26,117 +24,25 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
 
-db = SQLAlchemy(app)
+# Import models and initialize db (MUST be after app config)
+from models import db, User, Professional, Appointment, Review, Contact
+db.init_app(app)
+
+# Initialize email
+from email_service import init_mail, send_appointment_confirmation
+init_mail(app)
+
 mail = Mail(app)
 
 # Store chatbot instances per session
 chatbots = {}
 
+from contact_routes import add_contact_routes
+add_contact_routes(app)
+
 # ============================================
 # DATABASE MODELS
 # ============================================
-class User(db.Model):
-    """User model for patient accounts"""
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
-    
-    # Relationships
-    appointments = db.relationship('Appointment', backref='user', lazy=True)
-    reviews = db.relationship('Review', backref='user', lazy=True)
-    
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-    
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-    
-    def __repr__(self):
-        return f'<User {self.email}>'
-
-class Professional(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    specialization = db.Column(db.String(200), nullable=False)
-    bio = db.Column(db.Text, nullable=False)
-    experience_years = db.Column(db.Integer, nullable=False)
-    education = db.Column(db.Text, nullable=False)
-    languages = db.Column(db.String(200), nullable=False)
-    image_url = db.Column(db.String(200), default='default-avatar.jpg')
-    available_days = db.Column(db.String(200), nullable=False)
-    rating = db.Column(db.Float, default=5.0)
-    total_reviews = db.Column(db.Integer, default=0)
-    is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    appointments = db.relationship('Appointment', backref='professional', lazy=True)
-    reviews = db.relationship('Review', backref='professional', lazy=True)
-
-    def update_rating(self):
-        """Recalculate average rating from reviews"""
-        reviews = Review.query.filter_by(professional_id=self.id, is_approved=True).all()
-        if reviews:
-            self.rating = sum(r.rating for r in reviews) / len(reviews)
-            self.total_reviews = len(reviews)
-        else:
-            self.rating = 5.0
-            self.total_reviews = 0
-
-    def __repr__(self):
-        return f'<Professional {self.name}>'
-
-class Appointment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    
-    # User info (can be guest or registered user)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    user_name = db.Column(db.String(100), nullable=False)
-    user_email = db.Column(db.String(120), nullable=False)
-    user_phone = db.Column(db.String(20), nullable=False)
-    
-    # Appointment details
-    professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
-    service = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    time = db.Column(db.Time, nullable=False)
-    message = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), default='Pending')
-    
-    # Notifications
-    confirmation_sent = db.Column(db.Boolean, default=False)
-    reminder_sent = db.Column(db.Boolean, default=False)
-    
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relationship
-    review = db.relationship('Review', backref='appointment', uselist=False, lazy=True)
-
-    def __repr__(self):
-        return f'<Appointment {self.user_name} - {self.date} {self.time}>'
-
-class Review(db.Model):
-    """Review and rating model"""
-    id = db.Column(db.Integer, primary_key=True)
-    
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    professional_id = db.Column(db.Integer, db.ForeignKey('professional.id'), nullable=False)
-    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=False)
-    
-    rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
-    comment = db.Column(db.Text, nullable=True)
-    is_approved = db.Column(db.Boolean, default=True)
-    is_anonymous = db.Column(db.Boolean, default=False)
-    
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<Review {self.rating} stars for Professional {self.professional_id}>'
 
 # Admin credentials
 ADMIN_USERNAME = 'admin'
@@ -1266,6 +1172,12 @@ def create_tables():
             print("✅ Sample professionals added!")
         
         print("✅ Database tables created successfully!")
+        
+        
+@app.route('/about')
+def about():
+    """About us page"""
+    return render_template('about.html')
 
 # ============================================
 # APPLICATION STARTUP

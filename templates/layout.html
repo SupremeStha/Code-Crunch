@@ -509,6 +509,13 @@
                         class="{{ 'active' if request.endpoint == 'professionals' else '' }}"
                         >Professionals</a
                     >
+                </li>                
+                <li>
+                    <a
+                        href="{{ url_for('about') }}"
+                        class="{{ 'active' if request.endpoint == 'about' else '' }}"
+                        >About Us</a
+                    >
                 </li>
                 <!-- <li>
                     <a
@@ -528,6 +535,8 @@
                     >
                 </li>
                 {% endif %}
+
+
             </ul>
 
             <div class="nav-buttons">
@@ -571,11 +580,13 @@
                         <li><a href="{{ url_for('index') }}">Home</a></li>
                         <li><a href="{{ url_for('professionals') }}">Find Professionals</a></li>
                         <li><a href="{{ url_for('ai_assessment') }}">AI Assessment</a></li>
-                        <!-- <li><a href="{{ url_for('check_status') }}">Check Status</a></li> -->
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                         {% if session.user_id %}
                         <li><a href="{{ url_for('user_dashboard') }}">My Dashboard</a></li>
                         {% else %}
                         <li><a href="{{ url_for('login') }}">Sign In</a></li>
+                        
                         {% endif %}
                     </ul>
                 </div>

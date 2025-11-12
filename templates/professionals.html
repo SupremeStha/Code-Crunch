@@ -13,12 +13,20 @@
         background: linear-gradient(135deg, #f0ebe5 0%, #e8dfd4 100%);
         min-height: calc(100vh - 56px);
         padding: 3rem 0;
+        position: relative;
     }
 
     .professionals-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
+    }
+
+    /* Blur effect when not logged in */
+    .content-locked {
+        filter: blur(8px);
+        pointer-events: none;
+        user-select: none;
     }
 
     .page-header {
@@ -282,6 +290,176 @@
         font-size: 1rem;
     }
 
+    /* Lock Overlay */
+    .lock-overlay {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        text-align: center;
+        background: white;
+        padding: 3rem 2.5rem;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        animation: fadeInScale 0.5s ease;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
+    .lock-icon-container {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 30px rgba(200, 149, 109, 0.4);
+        position: relative;
+    }
+
+    .lock-icon-container::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        opacity: 0.2;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.2;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.1;
+        }
+    }
+
+    .lock-icon-container svg {
+        width: 60px;
+        height: 60px;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .lock-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .lock-subtitle {
+        color: #666;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .lock-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .lock-btn {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 150px;
+        justify-content: center;
+    }
+
+    .lock-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .lock-btn-primary {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+        box-shadow: 0 4px 15px rgba(200, 149, 109, 0.3);
+    }
+
+    .lock-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+        color: white;
+    }
+
+    .lock-btn-secondary {
+        background: white;
+        color: #c8956d;
+        border: 2px solid #c8956d;
+    }
+
+    .lock-btn-secondary:hover {
+        background: #fdf8f3;
+        transform: translateY(-2px);
+        color: #c8956d;
+    }
+
+    .lock-benefits {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e0e0e0;
+        text-align: left;
+    }
+
+    .benefits-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        color: #555;
+        font-size: 0.95rem;
+    }
+
+    .benefit-item svg {
+        width: 20px;
+        height: 20px;
+        color: #27ae60;
+        flex-shrink: 0;
+    }
+
     @media (max-width: 768px) {
         .professionals-container {
             padding: 0 1rem;
@@ -303,6 +481,32 @@
         .info-grid {
             grid-template-columns: 1fr;
         }
+
+        .lock-overlay {
+            padding: 2rem 1.5rem;
+        }
+
+        .lock-title {
+            font-size: 1.75rem;
+        }
+
+        .lock-icon-container {
+            width: 100px;
+            height: 100px;
+        }
+
+        .lock-icon-container svg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .lock-actions {
+            flex-direction: column;
+        }
+
+        .lock-btn {
+            width: 100%;
+        }
     }
 
     @media (min-width: 769px) and (max-width: 1200px) {
@@ -314,95 +518,161 @@
 
 <div class="professionals-page">
     <div class="professionals-container">
-        <div class="page-header">
-            <h1 class="page-title">Our Mental Health Professionals</h1>
-            <p class="page-subtitle">Choose from our team of experienced and compassionate mental health professionals</p>
-        </div>
+        <!-- Content (blurred if not logged in) -->
+        <div class="{% if not session.user_id %}content-locked{% endif %}">
+            <div class="page-header">
+                <h1 class="page-title">Our Mental Health Professionals</h1>
+                <p class="page-subtitle">Choose from our team of experienced and compassionate mental health professionals</p>
+            </div>
 
-        {% if professionals %}
-        <div class="professionals-grid">
-            {% for prof in professionals %}
-            <div class="professional-card">
-                <div class="card-image-container">
-                    <div class="card-image-placeholder">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+            {% if professionals %}
+            <div class="professionals-grid">
+                {% for prof in professionals %}
+                <div class="professional-card">
+                    <div class="card-image-container">
+                        <div class="card-image-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="card-content">
+                        <h2 class="professional-name">{{ prof.name }}</h2>
+                        <p class="professional-title">{{ prof.title }}</p>
+
+                        <div class="specialization-section">
+                            <div class="specialization-tags">
+                                {% for spec in prof.specialization.split(',')[:3] %}
+                                <span class="tag">{{ spec.strip() }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span class="info-text">{{ prof.experience_years }} years <br>Experience</span>
+                            </div>
+
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span class="info-text">{{ prof.languages }}</span>
+                            </div>
+                        </div>
+
+                        <div class="rating-section">
+                            <div class="stars">
+                                {% for i in range(5) %}
+                                <span class="star">★</span>
+                                {% endfor %}
+                            </div>
+                            <span class="rating-text">{{ prof.rating }} ({{ prof.total_reviews }} reviews)</span>
+                        </div>
+
+                        <div class="card-buttons">
+                            <a href="{{ url_for('professional_detail', prof_id=prof.id) }}" class="btn btn-outline">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                Profile
+                            </a>
+                            <a href="{{ url_for('book_with_professional', prof_id=prof.id) }}" class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                Book Now
+                            </a>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <h3>No Professionals Available</h3>
+                <p>Please check back later or contact us for more information.</p>
+            </div>
+            {% endif %}
+        </div>
 
-                <div class="card-content">
-                    <h2 class="professional-name">{{ prof.name }}</h2>
-                    <p class="professional-title">{{ prof.title }}</p>
+        <!-- Lock Overlay (shown when not logged in) -->
+        {% if not session.user_id %}
+        <div class="lock-overlay">
+            <div class="lock-icon-container">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
 
-                    <div class="specialization-section">
-                        <div class="specialization-tags">
-                            {% for spec in prof.specialization.split(',')[:3] %}
-                            <span class="tag">{{ spec.strip() }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
+            <h2 class="lock-title">Sign In Required</h2>
+            <p class="lock-subtitle">Please sign in or create an account to view our mental health professionals and book appointments.</p>
 
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            <span class="info-text">{{ prof.experience_years }} years <br>Experience</span>
-                        </div>
+            <div class="lock-actions">
+                <a href="{{ url_for('login') }}?next={{ request.path }}" class="lock-btn lock-btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    Sign In
+                </a>
+                <a href="{{ url_for('register') }}" class="lock-btn lock-btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    Create Account
+                </a>
+            </div>
 
-                        <div class="info-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
-                            </svg>
-                            <span class="info-text">{{ prof.languages }}</span>
-                        </div>
-                    </div>
-
-                    <div class="rating-section">
-                        <div class="stars">
-                            {% for i in range(5) %}
-                            <span class="star">★</span>
-                            {% endfor %}
-                        </div>
-                        <span class="rating-text">{{ prof.rating }} ({{ prof.total_reviews }} reviews)</span>
-                    </div>
-
-                    <div class="card-buttons">
-                        <a href="{{ url_for('professional_detail', prof_id=prof.id) }}" class="btn btn-outline">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            Profile
-                        </a>
-                        <a href="{{ url_for('book_with_professional', prof_id=prof.id) }}" class="btn btn-primary">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
-                            Book Now
-                        </a>
-                    </div>
+            <div class="lock-benefits">
+                <h3 class="benefits-title">Why Create an Account?</h3>
+                <div class="benefit-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Book appointments with licensed professionals</span>
+                </div>
+                <div class="benefit-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Access your appointment history</span>
+                </div>
+                <div class="benefit-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Manage your mental health journey</span>
+                </div>
+                <div class="benefit-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Leave reviews and ratings</span>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <h3>No Professionals Available</h3>
-            <p>Please check back later or contact us for more information.</p>
         </div>
         {% endif %}
     </div>

@@ -1,0 +1,744 @@
+{% extends "layout.html" %}
+{% block title %}About Us & Contact{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .about-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+        padding: 5rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,138.7C960,139,1056,117,1152,112C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+        background-size: cover;
+        opacity: 0.3;
+    }
+
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        line-height: 1.8;
+        font-weight: 400;
+    }
+
+    /* Main Content Container */
+    .about-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    /* Mission Section */
+    .mission-section {
+        background: white;
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        margin-bottom: 3rem;
+        border: 1px solid rgba(212, 165, 116, 0.2);
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #d4a574, #c8956d);
+        border-radius: 2px;
+    }
+
+    .mission-text {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        color: #555;
+        text-align: center;
+        max-width: 900px;
+        margin: 2rem auto 0;
+    }
+
+    /* Values Grid */
+    .values-section {
+        margin-bottom: 3rem;
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .value-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(212, 165, 116, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .value-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #d4a574, #c8956d);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .value-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(200, 149, 109, 0.2);
+    }
+
+    .value-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .value-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 24px rgba(200, 149, 109, 0.3);
+    }
+
+    .value-icon svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+    }
+
+    .value-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .value-description {
+        color: #666;
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        border-radius: 24px;
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+        margin-top: 2rem;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #d4a574, #f4d3a2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    /* Contact Section */
+    .contact-section {
+        margin-bottom: 3rem;
+    }
+
+    .contact-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: start;
+        margin-top: 2rem;
+    }
+
+    /* Contact Form */
+    .contact-form-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(212, 165, 116, 0.2);
+    }
+
+    .form-section-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-group label .required {
+        color: #e74c3c;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #c8956d;
+        box-shadow: 0 0 0 3px rgba(200, 149, 109, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 150px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(200, 149, 109, 0.4);
+    }
+
+    .submit-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Contact Info Cards */
+    .contact-info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+        border: 1px solid rgba(212, 165, 116, 0.2);
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .info-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .info-icon svg {
+        width: 24px;
+        height: 24px;
+        color: white;
+    }
+
+    .info-card-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .info-card-content {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .info-card-content a {
+        color: #c8956d;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .info-card-content a:hover {
+        color: #b8860b;
+        text-decoration: underline;
+    }
+
+    /* Crisis Alert */
+    .crisis-alert {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(231, 76, 60, 0.3);
+    }
+
+    .crisis-alert-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .crisis-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .crisis-icon svg {
+        width: 24px;
+        height: 24px;
+        color: white;
+    }
+
+    .crisis-alert h3 {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .crisis-alert p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .crisis-alert strong {
+        font-size: 1.1rem;
+    }
+
+    /* Flash Messages */
+    .alert {
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+        animation: slideInDown 0.3s ease;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .about-container {
+            padding: 2rem 1rem;
+        }
+
+        .mission-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .values-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+        }
+
+        .contact-content {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-info-section {
+            order: -1;
+        }
+
+        .contact-form-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="about-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">About Code Crunch</h1>
+            <p class="hero-subtitle">Empowering minds, transforming lives through compassionate mental health care and innovative technology.</p>
+        </div>
+    </section>
+
+    <div class="about-container">
+        <!-- Mission Section -->
+        <section class="mission-section">
+            <h2 class="section-title">Our Mission</h2>
+            <p class="mission-text">
+                At Code Crunch, we believe that everyone deserves access to quality mental health care. Our mission is to break down barriers 
+                to mental health services by combining cutting-edge technology with compassionate, professional care. We're committed to creating 
+                a safe, supportive environment where individuals can find the help they need, when they need it.
+            </p>
+        </section>
+
+        <!-- Values Section -->
+        <section class="values-section">
+            <h2 class="section-title">Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="value-title">Compassion</h3>
+                    <p class="value-description">We approach every individual with empathy, understanding, and genuine care for their wellbeing.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="value-title">Confidentiality</h3>
+                    <p class="value-description">Your privacy is paramount. We maintain the highest standards of confidentiality and data security.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="value-title">Excellence</h3>
+                    <p class="value-description">We partner with only the most qualified, experienced mental health professionals.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <h3 class="value-title">Accessibility</h3>
+                    <p class="value-description">Mental health care should be accessible to everyone, anywhere, at any time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <h2 class="section-title" style="color: white;">Our Impact</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Lives Touched</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Licensed Professionals</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support Available</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2 class="section-title">Get in Touch</h2>
+            
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="contact-content">
+                <!-- Contact Form -->
+                <div class="contact-form-section">
+                    <h3 class="form-section-title">Send us a Message</h3>
+                    <form method="POST" action="{{ url_for('contact') }}">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number (Optional)</label>
+                            <input type="tel" id="phone" name="phone" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject <span class="required">*</span></label>
+                            <select id="subject" name="subject" class="form-control" required>
+                                <option value="">Select a subject...</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Appointment Question">Appointment Question</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Billing Question">Billing Question</option>
+                                <option value="Feedback">Feedback</option>
+                                <option value="Partnership">Partnership Opportunity</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message <span class="required">*</span></label>
+                            <textarea id="message" name="message" class="form-control" required placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info-section">
+                    <!-- Email -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <h3 class="info-card-title">Email Us</h3>
+                        </div>
+                        <div class="info-card-content">
+                            <p>For general inquiries and support</p>
+                            <a href="mailto:support@codecrunch.com">support@codecrunch.com</a>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="info-card-title">Call Us</h3>
+                        </div>
+                        <div class="info-card-content">
+                            <p>Monday - Friday: 9am - 6pm</p>
+                            <a href="tel:+1234567890">+1 (234) 567-890</a>
+                        </div>
+                    </div>
+
+                    <!-- Office -->
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <h3 class="info-card-title">Visit Us</h3>
+                        </div>
+                        <div class="info-card-content">
+                            <p>123 Mental Health Plaza<br>
+                            Suite 456<br>
+                            City, State 12345</p>
+                        </div>
+                    </div>
+
+                    <!-- Crisis Support -->
+                    <div class="crisis-alert">
+                        <div class="crisis-alert-header">
+                            <div class="crisis-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                            </div>
+                            <h3>Need Immediate Help?</h3>
+                        </div>
+                        <p>If you're in crisis or need urgent support, please reach out immediately:</p>
+                        <p><strong>988 - Suicide & Crisis Lifeline</strong><br>
+                        Available 24/7</p>
+                        <p><strong>Crisis Text Line</strong><br>
+                        Text HOME to 741741</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

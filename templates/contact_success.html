@@ -1,0 +1,268 @@
+{% extends "layout.html" %}
+{% block title %}Message Sent Successfully{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .success-page {
+        background: linear-gradient(135deg, #faf7f2 0%, #f0ebe5 100%);
+        min-height: calc(100vh - 56px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .success-container {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    .success-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .success-header {
+        background: linear-gradient(135deg, #27ae60, #229954);
+        color: white;
+        padding: 3rem 2rem;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .success-icon svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+    }
+
+    .success-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .success-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .success-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .message-details {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #666;
+    }
+
+    .detail-value {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .info-box {
+        background: #e8f5e9;
+        border-left: 4px solid #27ae60;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .info-box h3 {
+        color: #27ae60;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .info-box ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #2c3e50;
+        line-height: 1.8;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.9rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(200, 149, 109, 0.4);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #666;
+        border: 2px solid #e0e0e0;
+    }
+
+    .btn-secondary:hover {
+        border-color: #c8956d;
+        color: #c8956d;
+    }
+
+    .email-note {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 1.5rem;
+        font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+        .success-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .success-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .success-body {
+            padding: 2rem 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="success-page">
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-header">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h1>Message Sent Successfully!</h1>
+                <p>Thank you for contacting us</p>
+            </div>
+
+            <div class="success-body">
+                <div class="message-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Message ID:</span>
+                        <span class="detail-value">#{{ contact.id }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Subject:</span>
+                        <span class="detail-value">{{ contact.subject }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Sent to:</span>
+                        <span class="detail-value">{{ contact.email }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date:</span>
+                        <span class="detail-value">{{ contact.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>What happens next?</h3>
+                    <ul>
+                        <li>Our team will review your message within 24-48 hours</li>
+                        <li>We'll respond to your email address: <strong>{{ contact.email }}</strong></li>
+                        <li>You can reference Message ID <strong>#{{ contact.id }}</strong> in any follow-up</li>
+                        <li>Check your email for a confirmation message</li>
+                    </ul>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        </svg>
+                        Back to Home
+                    </a>
+                    <a href="{{ url_for('professionals') }}" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Browse Professionals
+                    </a>
+                </div>
+
+                <p class="email-note">
+                    📧 A confirmation email has been sent to {{ contact.email }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

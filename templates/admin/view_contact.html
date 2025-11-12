@@ -1,0 +1,406 @@
+{% extends "layout.html" %}
+{% block title %}View Contact Message - Admin{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .admin-page {
+        background: #f0ebe5;
+        min-height: calc(100vh - 56px);
+        padding: 3rem 0;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-title h1 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #218838;
+        transform: translateY(-2px);
+    }
+
+    /* Message Card */
+    .message-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .message-header {
+        background: linear-gradient(135deg, #d4a574, #c8956d);
+        color: white;
+        padding: 2rem;
+    }
+
+    .message-id-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .message-subject {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .message-body {
+        padding: 2rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #c8956d;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+
+    .status-unread {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-read {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-resolved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .message-content {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .content-label {
+        font-size: 1rem;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+    }
+
+    .message-text {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #2c3e50;
+        white-space: pre-wrap;
+    }
+
+    /* Update Status Form */
+    .status-update-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #c8956d;
+        box-shadow: 0 0 0 3px rgba(200, 149, 109, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .admin-notes-display {
+        background: #fff3cd;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid #ffc107;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="admin-page">
+    <div class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Contact Message Details</h1>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="{{ url_for('admin_contacts') }}" class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Messages
+                </a>
+                <a href="{{ url_for('delete_contact', msg_id=contact.id) }}" 
+                   class="btn btn-danger"
+                   onclick="return confirm('Are you sure you want to delete this message?')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Delete
+                </a>
+            </div>
+        </div>
+
+        <!-- Message Details -->
+        <div class="message-card">
+            <div class="message-header">
+                <div class="message-id-badge">Message #{{ contact.id }}</div>
+                <h2 class="message-subject">{{ contact.subject }}</h2>
+            </div>
+
+            <div class="message-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">From</div>
+                        <div class="info-value">{{ contact.name }}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value">{{ contact.email }}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Phone</div>
+                        <div class="info-value">{{ contact.phone if contact.phone else 'Not provided' }}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            <span class="status-badge status-{{ contact.status.lower() }}">
+                                {{ contact.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Received</div>
+                        <div class="info-value">{{ contact.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Last Updated</div>
+                        <div class="info-value">{{ contact.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                </div>
+
+                <div class="message-content">
+                    <div class="content-label">Message</div>
+                    <div class="message-text">{{ contact.message }}</div>
+                </div>
+
+                {% if contact.admin_notes %}
+                <div class="admin-notes-display">
+                    <div class="content-label">Admin Notes</div>
+                    <div class="message-text">{{ contact.admin_notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Update Status Form -->
+        <div class="status-update-card">
+            <h2 class="section-title">Update Status</h2>
+            <form method="POST" action="{{ url_for('update_contact_status', msg_id=contact.id) }}">
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-control" required>
+                        <option value="Unread" {% if contact.status == 'Unread' %}selected{% endif %}>Unread</option>
+                        <option value="Read" {% if contact.status == 'Read' %}selected{% endif %}>Read</option>
+                        <option value="Resolved" {% if contact.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin_notes">Admin Notes (Optional)</label>
+                    <textarea id="admin_notes" name="admin_notes" class="form-control" placeholder="Add any internal notes about this message...">{{ contact.admin_notes if contact.admin_notes else '' }}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Update Status
+                    </button>
+                    <a href="mailto:{{ contact.email }}?subject=Re: {{ contact.subject }}" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        Reply via Email
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
