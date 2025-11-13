@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAbWJ_xVID7C70G_4p3MCbFoIUxtA-Nm0M')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyDHkjJVXodztLabUGy8PWLCQeXTNNvN5oI')
 
 MAX_CONVERSATION_LENGTH = 50
 SYSTEM_PROMPT = """You are a compassionate mental health support assistant. 
