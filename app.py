@@ -6,7 +6,6 @@ from functools import wraps
 from email_service import init_mail, send_appointment_confirmation, send_contact_confirmation
 import secrets
 import os
-import sys
 
 # Load environment variables
 from dotenv import load_dotenv
