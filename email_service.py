@@ -4,6 +4,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Always import both to avoid runtime errors
+from flask_mail import Mail, Message
+
 # Check if SendGrid API key is available
 USE_SENDGRID = bool(os.environ.get('SENDGRID_API_KEY'))
 
@@ -13,15 +16,11 @@ if USE_SENDGRID:
     from sendgrid.helpers.mail import Mail as SendGridMail
     logger.info("📧 Using SendGrid API for emails (Production)")
     
-    # Dummy mail object for compatibility
-    class DummyMail:
-        def init_app(self, app):
-            pass
-    mail = DummyMail()
+    # Create dummy Flask-Mail instance for compatibility
+    mail = Mail()
     
 else:
     # Use Flask-Mail for local development
-    from flask_mail import Mail, Message
     logger.info("📧 Using Gmail SMTP for emails (Local Development)")
     mail = Mail()
 
