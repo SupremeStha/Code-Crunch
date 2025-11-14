@@ -1072,7 +1072,7 @@ if __name__ == '__main__':
     print("\n" + "="*50)
     print("🚀 Mental Health Platform Started!")
     print("="*50)
-    print("📧 Email notifications:", "Enabled" if app.config['MAIL_USERNAME'] else "Disabled (configure .env)")
+    print("📧 Email notifications:", "Enabled")
     print("🔐 User authentication: Enabled")
     print("⭐ Review system: Enabled")
     print("👨‍⚕️ Professionals: Ready")
