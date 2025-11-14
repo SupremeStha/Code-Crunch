@@ -1,5 +1,3 @@
-// Enhanced Chatbot JavaScript with All Features
-
 const STORAGE_KEY = "mental_health_chatbot_state";
 let currentState = {
     conversation_history: [],
@@ -10,7 +8,6 @@ let currentState = {
     session_count: 0
 };
 
-// Initialize
 document.addEventListener('DOMContentLoaded', function() {
     loadState();
     restoreChat();

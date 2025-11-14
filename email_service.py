@@ -1,8 +1,10 @@
-# email_service.py - Email notification system
+# email_service.py - Email notification system with async support
 from flask_mail import Mail, Message
-from flask import render_template_string
+from flask import current_app
+from threading import Thread
 from datetime import datetime, timedelta
 import os
+import sys
 
 mail = Mail()
 
@@ -16,6 +18,51 @@ def init_mail(app):
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
     
     mail.init_app(app)
+    
+    # Log email configuration (without exposing password)
+    print("📧 Email Configuration:")
+    print(f"  Server: {app.config['MAIL_SERVER']}:{app.config['MAIL_PORT']}")
+    print(f"  Username: {app.config['MAIL_USERNAME']}")
+    print(f"  TLS: {app.config['MAIL_USE_TLS']}")
+    print(f"  Sender: {app.config['MAIL_DEFAULT_SENDER']}")
+    sys.stdout.flush()
+
+def send_async_email(app, msg):
+    """Send email asynchronously in background thread"""
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print(f"✅ Email sent successfully to {msg.recipients}")
+            sys.stdout.flush()
+        except Exception as e:
+            print(f"❌ Error sending async email: {str(e)}")
+            sys.stdout.flush()
+
+def send_email_safely(msg, description="Email"):
+    """Wrapper to send email safely without blocking"""
+    try:
+        # Check if email is configured
+        if not current_app.config.get('MAIL_USERNAME'):
+            print(f"⚠️ Email not configured - skipping {description}")
+            sys.stdout.flush()
+            return False
+        
+        # Get current app context
+        app = current_app._get_current_object()
+        
+        # Send email in background thread
+        thread = Thread(target=send_async_email, args=(app, msg))
+        thread.daemon = True  # Thread will close when main thread closes
+        thread.start()
+        
+        print(f"📤 {description} queued for sending")
+        sys.stdout.flush()
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error queueing {description}: {str(e)}")
+        sys.stdout.flush()
+        return False
 
 def send_appointment_confirmation(appointment):
     """Send appointment confirmation email"""
@@ -87,10 +134,6 @@ def send_appointment_confirmation(appointment):
                     <li>Please arrive 5-10 minutes before your scheduled time</li>
                 </ul>
                 
-                <center>
-                    <a href="http://localhost:5000/check-status" class="button">Check Appointment Status</a>
-                </center>
-                
                 <p>If you need to cancel or reschedule, please contact us at least 24 hours in advance.</p>
                 
                 <div class="footer">
@@ -106,14 +149,18 @@ def send_appointment_confirmation(appointment):
     try:
         msg = Message(subject, recipients=[appointment.user_email])
         msg.html = html_body
-        mail.send(msg)
         
-        # Mark as sent
-        appointment.confirmation_sent = True
+        # Send email asynchronously
+        success = send_email_safely(msg, f"Appointment confirmation to {appointment.user_email}")
         
-        return True
+        # Mark as sent (optimistically)
+        if success:
+            appointment.confirmation_sent = True
+        
+        return success
     except Exception as e:
-        print(f"Error sending confirmation email: {str(e)}")
+        print(f"Error creating confirmation email: {str(e)}")
+        sys.stdout.flush()
         return False
 
 def send_appointment_reminder(appointment):
@@ -158,10 +205,6 @@ def send_appointment_reminder(appointment):
                     <li>Prepare any questions you'd like to discuss</li>
                 </ul>
                 
-                <center>
-                    <a href="http://localhost:5000/check-status" class="button">View Appointment Details</a>
-                </center>
-                
                 <p>If you need to cancel, please let us know as soon as possible.</p>
             </div>
         </div>
@@ -172,14 +215,16 @@ def send_appointment_reminder(appointment):
     try:
         msg = Message(subject, recipients=[appointment.user_email])
         msg.html = html_body
-        mail.send(msg)
         
-        # Mark as sent
-        appointment.reminder_sent = True
+        success = send_email_safely(msg, f"Appointment reminder to {appointment.user_email}")
         
-        return True
+        if success:
+            appointment.reminder_sent = True
+        
+        return success
     except Exception as e:
-        print(f"Error sending reminder email: {str(e)}")
+        print(f"Error creating reminder email: {str(e)}")
+        sys.stdout.flush()
         return False
 
 def send_status_update_email(appointment, old_status, new_status):
@@ -242,10 +287,11 @@ def send_status_update_email(appointment, old_status, new_status):
     try:
         msg = Message(subject, recipients=[appointment.user_email])
         msg.html = html_body
-        mail.send(msg)
-        return True
+        
+        return send_email_safely(msg, f"Status update to {appointment.user_email}")
     except Exception as e:
-        print(f"Error sending status update email: {str(e)}")
+        print(f"Error creating status update email: {str(e)}")
+        sys.stdout.flush()
         return False
 
 def send_review_request_email(appointment):
@@ -276,10 +322,6 @@ def send_review_request_email(appointment):
                 <p>Thank you for choosing our mental health services. We hope your session was helpful!</p>
                 <p>Your feedback is valuable and helps others find the right professional for their needs.</p>
                 
-                <center>
-                    <a href="http://localhost:5000/leave-review/{appointment.id}" class="button">Leave a Review</a>
-                </center>
-                
                 <p>It only takes a minute and makes a big difference!</p>
             </div>
         </div>
@@ -290,12 +332,13 @@ def send_review_request_email(appointment):
     try:
         msg = Message(subject, recipients=[appointment.user_email])
         msg.html = html_body
-        mail.send(msg)
-        return True
+        
+        return send_email_safely(msg, f"Review request to {appointment.user_email}")
     except Exception as e:
-        print(f"Error sending review request email: {str(e)}")
+        print(f"Error creating review request email: {str(e)}")
+        sys.stdout.flush()
         return False
-    
+
 def send_contact_confirmation(contact):
     """Send confirmation email when user submits contact form"""
     subject = "We've received your message"
@@ -352,8 +395,9 @@ def send_contact_confirmation(contact):
     try:
         msg = Message(subject, recipients=[contact.email])
         msg.html = html_body
-        mail.send(msg)
-        return True
+        
+        return send_email_safely(msg, f"Contact confirmation to {contact.email}")
     except Exception as e:
-        print(f"Error sending contact confirmation email: {str(e)}")
+        print(f"Error creating contact confirmation email: {str(e)}")
+        sys.stdout.flush()
         return False
