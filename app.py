@@ -1,9 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_mail import Mail, Message
 from datetime import datetime, date, time, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from email_service import init_mail, send_appointment_confirmation, send_contact_confirmation
 import secrets
 import os
 
@@ -16,23 +14,20 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Email configuration
-# app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-# app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-# app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
-# app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-# app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-# app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
-
 # Import models and initialize db (MUST be after app config)
 from models import db, User, Professional, Appointment, Review, Contact
 db.init_app(app)
 
-# Initialize email
-from email_service import init_mail, send_appointment_confirmation
+# Initialize email service - import ALL email functions
+from email_service import (
+    init_mail, 
+    send_appointment_confirmation, 
+    send_status_update_email,
+    send_review_request_email,
+    send_contact_confirmation,
+    send_appointment_reminder
+)
 init_mail(app)
-
-# mail = Mail(app)
 
 # Store chatbot instances per session
 chatbots = {}
@@ -220,6 +215,8 @@ def cancel_appointment(appt_id):
     
     db.session.commit()
     
+    # Send cancellation email
+    print(f"📧 Sending cancellation email to {appointment.user_email}")
     send_status_update_email(appointment, old_status, 'Cancelled')
     
     flash('Appointment cancelled successfully.', 'success')
@@ -315,19 +312,10 @@ def leave_review(appt_id):
     return render_template('leave_review.html', appointment=appointment)
 
 # ============================================
-# CHATBOT BOOKING ROUTES (ADD THESE TO YOUR APP.PY)
+# CHATBOT BOOKING ROUTES
 # ============================================
 
-from flask import render_template, request, jsonify, session
 from chatbot import MentalHealthChatbot
-from datetime import datetime
-import secrets
-
-# Import db, Professional, and Appointment from your existing models
-# These should already be imported at the top of your app.py
-
-# Store chatbot instances per session
-chatbots = {}
 
 @app.route('/ai-assessment')
 def ai_assessment():
@@ -426,8 +414,6 @@ def api_professionals():
             'error': 'Could not fetch professionals',
             'message': str(e)
         }), 500
-        
-        
 
 @app.route('/chat/complete-booking', methods=['POST'])
 def complete_booking():
@@ -492,12 +478,9 @@ def complete_booking():
         db.session.add(appointment)
         db.session.commit()
         
-        # Send confirmation email (if you have email service set up)
+        # Send confirmation email
         try:
-            from email_service import send_appointment_confirmation
             send_appointment_confirmation(appointment)
-        except ImportError:
-            print("Email service not available")
         except Exception as e:
             print(f"Error sending confirmation email: {str(e)}")
         
@@ -689,6 +672,7 @@ def book_with_professional(prof_id):
             db.session.add(appointment)
             db.session.commit()
 
+            # Send confirmation email
             send_appointment_confirmation(appointment)
 
             flash('Appointment booked successfully! Check your email for confirmation.', 'success')
