@@ -180,9 +180,12 @@ def send_status_update_email(appointment, old_status, new_status):
     """
     
     try:
+        print(f"📧 Sending status update email to {appointment.user_email}")
+        
         if USE_SENDGRID:
             sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
             if not sendgrid_api_key:
+                print("❌ SENDGRID_API_KEY not found")
                 return False
                 
             message = SendGridMail(
@@ -192,19 +195,21 @@ def send_status_update_email(appointment, old_status, new_status):
                 html_content=html_body
             )
             sg = SendGridAPIClient(sendgrid_api_key)
-            sg.send(message)
+            response = sg.send(message)
+            print(f"✅ Status update email sent via SendGrid! Status: {response.status_code}")
         else:
             from flask_mail import Message
             msg = Message(subject, recipients=[appointment.user_email])
             msg.html = html_body
             mail.send(msg)
+            print(f"✅ Status update email sent via Gmail SMTP!")
         
-        print(f"✅ Status update email sent to {appointment.user_email}")
         return True
     except Exception as e:
         print(f"❌ Error sending status update email: {str(e)}")
         import traceback
         traceback.print_exc()
+        logger.error(f"Error sending status update email: {str(e)}")
         return False
 
 
@@ -241,9 +246,12 @@ def send_review_request_email(appointment):
     """
     
     try:
+        print(f"📧 Sending review request email to {appointment.user_email}")
+        
         if USE_SENDGRID:
             sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
             if not sendgrid_api_key:
+                print("❌ SENDGRID_API_KEY not found")
                 return False
                 
             message = SendGridMail(
@@ -253,12 +261,14 @@ def send_review_request_email(appointment):
                 html_content=html_body
             )
             sg = SendGridAPIClient(sendgrid_api_key)
-            sg.send(message)
+            response = sg.send(message)
+            print(f"✅ Review request email sent via SendGrid! Status: {response.status_code}")
         else:
             from flask_mail import Message
             msg = Message(subject, recipients=[appointment.user_email])
             msg.html = html_body
             mail.send(msg)
+            print(f"✅ Review request email sent via Gmail SMTP!")
         
         return True
     except Exception as e:
@@ -300,9 +310,12 @@ def send_contact_confirmation(contact):
     """
     
     try:
+        print(f"📧 Sending contact confirmation email to {contact.email}")
+        
         if USE_SENDGRID:
             sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
             if not sendgrid_api_key:
+                print("❌ SENDGRID_API_KEY not found")
                 return False
                 
             message = SendGridMail(
@@ -312,12 +325,14 @@ def send_contact_confirmation(contact):
                 html_content=html_body
             )
             sg = SendGridAPIClient(sendgrid_api_key)
-            sg.send(message)
+            response = sg.send(message)
+            print(f"✅ Contact confirmation email sent via SendGrid! Status: {response.status_code}")
         else:
             from flask_mail import Message
             msg = Message(subject, recipients=[contact.email])
             msg.html = html_body
             mail.send(msg)
+            print(f"✅ Contact confirmation email sent via Gmail SMTP!")
         
         return True
     except Exception as e:
@@ -365,9 +380,12 @@ def send_appointment_reminder(appointment):
     """
     
     try:
+        print(f"📧 Sending appointment reminder email to {appointment.user_email}")
+        
         if USE_SENDGRID:
             sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
             if not sendgrid_api_key:
+                print("❌ SENDGRID_API_KEY not found")
                 return False
                 
             message = SendGridMail(
@@ -377,12 +395,14 @@ def send_appointment_reminder(appointment):
                 html_content=html_body
             )
             sg = SendGridAPIClient(sendgrid_api_key)
-            sg.send(message)
+            response = sg.send(message)
+            print(f"✅ Appointment reminder email sent via SendGrid! Status: {response.status_code}")
         else:
             from flask_mail import Message
             msg = Message(subject, recipients=[appointment.user_email])
             msg.html = html_body
             mail.send(msg)
+            print(f"✅ Appointment reminder email sent via Gmail SMTP!")
         
         appointment.reminder_sent = True
         return True
