@@ -13,3 +13,4 @@ typing-extensions>=4.7.0
 Flask-Mail==0.9.1
 Werkzeug==3.0.0
 sendgrid==6.11.0
+gunicorn==21.2.0

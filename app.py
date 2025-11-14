@@ -17,12 +17,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///appointments.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration
-app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
+# app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+# app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+# app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+# app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+# app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+# app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
 
 # Import models and initialize db (MUST be after app config)
 from models import db, User, Professional, Appointment, Review, Contact
@@ -32,7 +32,7 @@ db.init_app(app)
 from email_service import init_mail, send_appointment_confirmation
 init_mail(app)
 
-mail = Mail(app)
+# mail = Mail(app)
 
 # Store chatbot instances per session
 chatbots = {}
