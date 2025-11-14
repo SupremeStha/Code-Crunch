@@ -1,10 +1,14 @@
-# email_service.py - Email notification system
+# email_service.py - Email notification system (FIXED FOR RENDER)
 from flask_mail import Mail, Message
 from flask import render_template_string
 from datetime import datetime, timedelta
 import os
 
 mail = Mail()
+
+def get_base_url():
+    """Get base URL from environment or default to localhost"""
+    return os.environ.get('APP_URL', 'http://localhost:5000')
 
 def init_mail(app):
     """Initialize Flask-Mail with app config"""
@@ -15,10 +19,15 @@ def init_mail(app):
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@mentalhealth.com')
     
+    # CRITICAL: Add timeout settings to prevent 502 errors
+    app.config['MAIL_MAX_EMAILS'] = None
+    app.config['MAIL_TIMEOUT'] = 10  # 10 second timeout
+    
     mail.init_app(app)
 
 def send_appointment_confirmation(appointment):
     """Send appointment confirmation email"""
+    base_url = get_base_url()
     subject = f"Appointment Confirmation - #{appointment.id}"
     
     html_body = f"""
@@ -88,7 +97,7 @@ def send_appointment_confirmation(appointment):
                 </ul>
                 
                 <center>
-                    <a href="http://localhost:5000/check-status" class="button">Check Appointment Status</a>
+                    <a href="{base_url}/check-status" class="button">Check Appointment Status</a>
                 </center>
                 
                 <p>If you need to cancel or reschedule, please contact us at least 24 hours in advance.</p>
@@ -118,6 +127,7 @@ def send_appointment_confirmation(appointment):
 
 def send_appointment_reminder(appointment):
     """Send appointment reminder email (24 hours before)"""
+    base_url = get_base_url()
     subject = f"Reminder: Upcoming Appointment Tomorrow - #{appointment.id}"
     
     html_body = f"""
@@ -159,7 +169,7 @@ def send_appointment_reminder(appointment):
                 </ul>
                 
                 <center>
-                    <a href="http://localhost:5000/check-status" class="button">View Appointment Details</a>
+                    <a href="{base_url}/check-status" class="button">View Appointment Details</a>
                 </center>
                 
                 <p>If you need to cancel, please let us know as soon as possible.</p>
@@ -250,6 +260,7 @@ def send_status_update_email(appointment, old_status, new_status):
 
 def send_review_request_email(appointment):
     """Send email requesting review after completed appointment"""
+    base_url = get_base_url()
     subject = f"How was your session? Leave a review"
     
     html_body = f"""
@@ -277,7 +288,7 @@ def send_review_request_email(appointment):
                 <p>Your feedback is valuable and helps others find the right professional for their needs.</p>
                 
                 <center>
-                    <a href="http://localhost:5000/leave-review/{appointment.id}" class="button">Leave a Review</a>
+                    <a href="{base_url}/leave-review/{appointment.id}" class="button">Leave a Review</a>
                 </center>
                 
                 <p>It only takes a minute and makes a big difference!</p>

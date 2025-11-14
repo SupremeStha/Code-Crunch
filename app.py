@@ -62,11 +62,17 @@ def login_required(f):
     return decorated_function
 
 # ============================================
-# EMAIL FUNCTIONS
+# EMAIL FUNCTIONS (FIXED FOR PRODUCTION)
 # ============================================
+
+def get_base_url():
+    """Get base URL from environment or default to localhost"""
+    return os.environ.get('APP_URL', 'http://localhost:5000')
+
 def send_appointment_confirmation(appointment):
     """Send appointment confirmation email"""
     try:
+        base_url = get_base_url()
         subject = f"Appointment Confirmation - #{appointment.id}"
         html_body = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -86,6 +92,9 @@ def send_appointment_confirmation(appointment):
                     <p><strong>Status:</strong> {appointment.status}</p>
                 </div>
                 <p>Please arrive 5-10 minutes before your scheduled time.</p>
+                <center>
+                    <a href="{base_url}/check-status" style="background: linear-gradient(135deg, #d4a574, #c8956d); color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">Check Status</a>
+                </center>
             </div>
         </div>
         """
@@ -99,6 +108,8 @@ def send_appointment_confirmation(appointment):
         return True
     except Exception as e:
         print(f"Error sending confirmation email: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def send_status_update_email(appointment, old_status, new_status):
@@ -127,11 +138,14 @@ def send_status_update_email(appointment, old_status, new_status):
         return True
     except Exception as e:
         print(f"Error sending status update email: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def send_review_request_email(appointment):
     """Send email requesting review after completed appointment"""
     try:
+        base_url = get_base_url()
         subject = "How was your session? Leave a review"
         html_body = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -143,7 +157,7 @@ def send_review_request_email(appointment):
                 <p>Thank you for your session with {appointment.professional.name}!</p>
                 <p>Your feedback helps others find the right professional. Please take a moment to leave a review.</p>
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="http://localhost:5000/leave-review/{appointment.id}" 
+                    <a href="{base_url}/leave-review/{appointment.id}" 
                        style="background: linear-gradient(135deg, #ffc107, #ff9800); color: white; 
                               padding: 15px 30px; text-decoration: none; border-radius: 10px; 
                               display: inline-block; font-weight: bold;">Leave a Review</a>
@@ -158,6 +172,8 @@ def send_review_request_email(appointment):
         return True
     except Exception as e:
         print(f"Error sending review request email: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 # ============================================
