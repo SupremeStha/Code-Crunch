@@ -1196,16 +1196,22 @@ def about():
     return render_template('about.html')
 
 # ============================================
-# APPLICATION STARTUP
+# APPLICATION STARTUP (FIXED FOR PRODUCTION)
 # ============================================
 if __name__ == '__main__':
     create_tables()
     print("\n" + "="*50)
     print("🚀 Mental Health Platform Started!")
     print("="*50)
-    print("📧 Email notifications:", "Enabled" if app.config['MAIL_USERNAME'] else "Disabled (configure .env)")
+    print("📧 Email notifications:", "Enabled" if app.config['MAIL_USERNAME'] else "Disabled")
     print("🔐 User authentication: Enabled")
     print("⭐ Review system: Enabled")
     print("👨‍⚕️ Professionals: Ready")
     print("="*50 + "\n")
-    app.run(host='0.0.0.0', debug=True, port=5000)
+    
+    # Use environment PORT for Render, fallback to 5000 for local
+    port = int(os.environ.get('PORT', 5000))
+    
+    # In production, Gunicorn will run the app
+    # This is only for local development
+    app.run(host='0.0.0.0', debug=False, port=port)
